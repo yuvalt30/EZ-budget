@@ -33,13 +33,22 @@ app.post("/insert", async (req, res) => {
  
     const budge = new BudgetModel({instName: instName, instCFO: CFOName, amount: amount});
     try{
-        res.send(instName + CFOName + " amount = " + amount)
 
         await budge.save();
         res.send("inserted data")
     } catch(err){
         console.log(err)
     }
+})
+
+app.get("/read", async (req, res) => {
+    BudgetModel.find({}, (err, result) => {
+        if(err){
+            res.send(err)
+        }
+
+        res.send(result)
+    })
 })
 
 app.listen(3001, ()=>{
