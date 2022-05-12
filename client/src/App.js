@@ -9,8 +9,9 @@ function App() {
   const [CFOName, setCFOName] = useState("")
   const [amount, setAmount] = useState(0)
   const [budgetList, setBudgetList] = useState([])
+  const [newAmount, setNewAmount] = useState(0)
   useEffect(()=>{
-    axios.get("http://localhost:3001/read").then((response => {
+    axios.get("http://localhost:3001/read").then((response => { 
       // console.log(response)
       setBudgetList(response.data)
     }))
@@ -24,6 +25,10 @@ function App() {
       amount: amount,
     });
   };
+
+  const updateAmount = (id)=>{
+    axios.put("http://localhost:3001/update", {id: id, newAmount: amount})
+  }
 
   return (
     <div className="App">
@@ -55,6 +60,15 @@ function App() {
       {budgetList.map((val, key) => {
         return <div key={key}>
           <h1>{val.instName}, {val.instCFO}, {val.amount}</h1>
+          <input
+            type="number"
+            placeholder="New Amount"
+            onChange={(event)=>{
+              setAmount(event.target.value)
+            }}
+          />
+          <button onClick={()=>updateAmount(val._id)}>Update Amount</button>
+          <button>Delete</button>
           </div>
       })}
     </div>
