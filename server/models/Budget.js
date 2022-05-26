@@ -1,19 +1,19 @@
 const mongoose = require("mongoose")
 
-const BudgetSchema = new mongoose.Schema({
-    instName: {
+const BudgetPlanSchema = new mongoose.Schema({
+    sectionName: {
         type: String,
         required: true,
     },
-    instCFO: {
-        type: String,
+    monthly: {
+        type: Number,
         required : true,
     },
-    amount: {
-        type: Number,
+    isRevenue: {
+        type: Boolean,
         required : true,
     },
 });
 
-const aBudget = mongoose.model("Budget", BudgetSchema)
-module.exports = aBudget
+
+module.exports = mongoose.model("Budget", BudgetSchema)
