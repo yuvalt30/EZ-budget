@@ -1,25 +1,20 @@
 const express = require('express')
 const BudgetSections = require('../models/BudgetSections')
 const router = express.Router()
+const helper = require('./helper')
 
 // get all sections, no subs
 router.get('/', async (req, res)=>{
-    const allSections = await BudgetSections.find({})
-    sectionsNames = []
-    allSections.forEach(section => sectionsNames.push(section.sectionName))
+    const allSections = await BudgetSections.find({}).aggregate([{$group: {
+        _id: sectionName
+    }}]).exec()
     res.send(sectionsNames)
 })
 
 // get specific section's subs
 router.get('/subs', async (req, res)=>{
-    try{
-    const aSection = await BudgetSections.find({sectionName: req.query.sectionName}).lean()
-
-    res.send(aSection[0].subSections)
-    }catch(err){
-        res.send(err)
-        console.log(err)
-    }
+    subs = await helper.getSubs(req.query.sectionName)
+    res.send(subs)
 })
 
 // create new section
