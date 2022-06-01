@@ -35,9 +35,9 @@ router.get('/', async (req, res)=>{
     // }
 
     const tr = new Trans({section:'6295091866b45d3af17cdc9e', amount: 300})
-    const tr2 = new Trans({section:'6295091866b45d3af17cdc9f', amount: 400})
-    const tr3 = new Trans({section:'6295091866b45d3af17cdca0', amount: 500})
-    const tr4 = new Trans({section:'6295091866b45d3af17cdca1' , amount: 1200})
+    const tr2 = new Trans({section:'6295090066b45d3af17cdc97', amount: 400})
+    const tr3 = new Trans({section:'6295090066b45d3af17cdc98', amount: 500})
+    const tr4 = new Trans({section:'6295090066b45d3af17cdc96' , amount: 1200})
     try{
         t = await tr.save();
         t2 = await tr2.save();

@@ -4,30 +4,24 @@ const Tran = require('../models/Transaction')
 
 
 
-async function getSections()
-{
-    try{
-         await BudgetSections.find({}).select({sectionName:true}).distinct('sectionName').exec().then(sections => {
-        console.log('2\n'+sections)
-            return sections
-        })}
-    catch(err)
-    {
-            console.log(err)
-    }
+async function getTransactionsBySecAndSub(secName, subName){
+    return removeNullsFromTrans(await Tran.getTransactionsBySecAndSubWithNulls(secName, subName))
+    
 }
 
+async function getTransactionsBySecName(secName){
+    return removeNullsFromTrans(await Tran.getTransactionsBySecNameWithNulls(secName))
+    
+}
 
-async function getSubs(aSectionName)
-{
-    try{
-        const subs = await BudgetSections.find({sectionName: aSectionName})
-            return subs
+async function removeNullsFromTrans(transWithNulls){
+    ret = []
+    transWithNulls.forEach(doc => {
+        if(doc.section){
+            ret.push(doc)
         }
-    catch(err)
-    {
-            console.log(err)
-    }
+    })
+    return ret
 }
 
 async function getExecForSec(sec){
@@ -49,4 +43,4 @@ async function getExecforSecandSub(sec, sub){
 
 }
 
-module.exports = {getSubs,getSections, getExecforSecandSub, getExecForSec}
+module.exports = {getTransactionsBySecAndSub, getTransactionsBySecName, getExecforSecandSub, getExecForSec}
