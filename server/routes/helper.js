@@ -4,17 +4,17 @@ const Tran = require('../models/Transaction')
 
 
 
-async function getTransactionsBySecAndSub(secName, subName){
+async function getTransactionsBySecAndSubAsync(secName, subName){
     return removeNullsFromTrans(await Tran.getTransactionsBySecAndSubWithNulls(secName, subName))
     
 }
 
-async function getTransactionsBySecName(secName){
+async function getTransactionsBySecNameAsync(secName){
     return removeNullsFromTrans(await Tran.getTransactionsBySecNameWithNulls(secName))
     
 }
 
-async function removeNullsFromTrans(transWithNulls){
+function removeNullsFromTrans(transWithNulls){
     ret = []
     transWithNulls.forEach(doc => {
         if(doc.section){
@@ -22,6 +22,20 @@ async function removeNullsFromTrans(transWithNulls){
         }
     })
     return ret
+}
+
+function divideTransByInOut(trans){
+    ret = [[],[]] // income, outcome
+    trans.forEach(tran => ret[tran.section.isIncome ? 0 : 1].push(tran))
+    return ret
+}
+
+function generateExecFromTransArray(trans){
+    exec = [0,0,0,0,0,0,0,0,0,0,0,0,]
+    trans.forEach(tran => {
+        exec[tran.date.getMonth()] += tran.amount
+    })
+    return exec
 }
 
 async function getExecForSec(sec){
@@ -43,4 +57,5 @@ async function getExecforSecandSub(sec, sub){
 
 }
 
-module.exports = {getTransactionsBySecAndSub, getTransactionsBySecName, getExecforSecandSub, getExecForSec}
+module.exports = {generateExecFromTransArray,divideTransByInOut, getTransactionsBySecAndSubAsync,
+                  getTransactionsBySecNameAsync, getExecforSecandSub, getExecForSec}

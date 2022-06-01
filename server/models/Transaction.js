@@ -20,7 +20,6 @@ TransactionSchema.static('getTransactionsBySecAndSubWithNulls', function(secName
      return this.find({ }).populate({
             path: 'section',
             match: {subSection: subName, sectionName: secName},
-            select: 'isIncome -_id'
         })
      });
 TransactionSchema.static('getTransactionsBySubId', function(subId) { return this.find({ section: subId }).populate('section')});
@@ -28,7 +27,6 @@ TransactionSchema.static('getTransactionsBySubId', function(subId) { return this
 TransactionSchema.static('getTransactionsBySecNameWithNulls', function(secName) { return this.find({}).populate({
     path:'section',
     match: {sectionName: secName},
-    select: 'subSection isIncome -_id'
 })});
 
 

@@ -1,18 +1,19 @@
 const mongoose = require("mongoose")
 
 const PlanSchema = new mongoose.Schema({
-    sectionName: {
-        type: String,
+    section: {
+        type: mongoose.Schema.Types.ObjectId,
         required: true,
+        ref: 'BudgetSection'
     },
-    subSections: {
-        type: String,
-        required : true,
-    },
-    amount : {
+    monthlyAmount : {
         type: Number,
         required: true,
     },
+    year: {
+        type: Number,
+        required: true
+    }
 });
 
 module.exports = mongoose.model("Plan", PlanSchema)
