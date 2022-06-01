@@ -21,21 +21,23 @@ function generateTrack(sectionId){
 // get general reflection of each section, as sum of its sub sections
 router.get('/', async (req, res)=>{
     let e = [0,0,0,0,0,0,0,0,0,0,0,0,]
-    e[3]+=55
         subs = await BudgetSections.getSubs('ישיבה')
         await subs.forEach(async (sub) => {
-            console.log(sub)
+            console.log('#####'+sub+'#####')
 
-            await Trans.find({section: sub._id}).then(a=>
-                {if(a[0]){
-            console.log(a[0].amount)
-            e[a[0].date.getMonth()+1] += a[0].amount
-            console.log(e)
+            await Trans.find({section: sub._id}).then(docs=>
+                {
+                    console.log(docs)
+                    if(docs[0]){
+                        docs.forEach(doc => {
+                            e[docs[0].date.getMonth()+1] += docs[0].amount
+                        })
+                        console.log(e)
 
-                }
+                    }
+                })
         })
-        })
-    res.send('OK')
+        res.send('OK')
 })
 
 // get reflection of specific section, showing each sub section
