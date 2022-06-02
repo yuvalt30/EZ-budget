@@ -8,18 +8,6 @@ router.get('/', async (req, res)=>{
     res.send(allTransactions)
 })
 
-// // get all Transacions by type (income/outcome)
-// router.get('/type', async (req, res)=>{
-//     try{
-//     const transactions = await BudgetSections.find({isIncome: req.query.isIncome})
-
-//     res.send(transactions)
-//     }catch(err){
-//         res.send(err)
-//         console.log(err)
-//     }
-// })
-
 // create new transaction
 router.post('/', async (req, res)=>{
     const newTransaction = new Transacion({sectionName: req.body.sectionName, subSections: req.body.subSections, amount: req.body.amount});
@@ -29,5 +17,7 @@ router.post('/', async (req, res)=>{
         console.log(err)
     }
 })
+
+//TODO: create many transaction from CSV file
 
 module.exports = router

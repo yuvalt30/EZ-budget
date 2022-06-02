@@ -22,19 +22,17 @@ const SectionTrackSchema = new mongoose.Schema({
         required: true,
         default: [0,0,0,0,0,0,0,0,0,0,0,0]
     },
-    updated: {
-        type: Date,
-        reqyured: true,
-        Default: new Date(1970,1,1,1,1,1)
-    }
+    // updated: {
+    //     type: Date,
+    //     reqyured: true,
+    //     Default: new Date(1970,1,1,1,1,1)
+    // }
 
 });
 
-SectionTrackSchema.method('isOutOfdate', function() { return Trans.find({ date: {"$gte": this.updated} })}); //TODO: need fix
+// SectionTrackSchema.method('isOutOfdate', function() { return Trans.find({ date: {"$gte": this.updated} })}); //TODO: need fix
 
-SectionTrackSchema.method('monthlyIncome', function() { return SubTrack.find({ year: this.year,  })});
-
-SectionTrackSchema.method('monthlyOutcome', function() { return Trans.find({ date: {"$gte": this.updated} })});
+SectionTrackSchema.method('monthlyIncome', function() { return SubTrack.getSectorMontlyPlan(this.section, this.year)});
 
 
 module.exports = mongoose.model("SectionTrack", SectionTrackSchema)

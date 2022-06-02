@@ -5,27 +5,27 @@ const helper = require('./helper')
 
 // get all sections, no subs
 router.get('/', async (req, res)=>{
-    const allSections = await BudgetSections.find({}).aggregate([{$group: {
-        _id: sectionName
-    }}]).exec()
+    sectionsNames = await BudgetSections.getSections()
     res.send(sectionsNames)
 })
 
 // get specific section's subs
 router.get('/subs', async (req, res)=>{
-    subs = await helper.getSubs(req.query.sectionName)
+    subs = await BudgetSections.getSubs(req.query.sectionName)
     res.send(subs)
 })
 
 // create new section
 router.post('/', async (req, res)=>{
-    const newSection = new BudgetSections({sectionName: req.body.sectionName, subSections: req.body.subSections});
+    const newSection = new BudgetSections({sectionName: req.body.sectionName, subSections: req.body.subSections, isIncome: req.body.isIncome});
     try{
         await newSection.save();
-        res.send("inserted data")
+        res.send("inserted 1/1 sections")
     } catch(err){
         console.log(err)
     }
 })
+
+// TODO: create new sections from CSV file
 
 module.exports = router
