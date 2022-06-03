@@ -6,6 +6,7 @@ const router = express.Router()
 const helper = require('./helper')
 const Tran = require('../models/Transaction')
 const SectionTrack = require('../models/SectionTrack')
+const SubTrack = require('../models/SubTrack')
 
 router.get('/test', async (req, res)=>{
     res.send(await Tran.getTransactionsBySubIdAsync('6295090066b45d3af17cdc97', req.query.year))
@@ -37,21 +38,26 @@ router.get('/section', async (req, res)=>{
     try{
     const trans = await Tran.getTransactionsBySubId(req.query.subId, req.query.year)
     exec = helper.generateExecFromTransArray(trans)
-    res.send(aSection[0].subSections)
+    newExec = new SubTrack({})
     }catch(err){
-        res.send(err)
         console.log(err)
+        res.send(err)
     }
 })
 
 // create new section
 router.post('/', async (req, res)=>{
-    const newSection = new BudgetSections({sectionName: req.body.sectionName, subSections: req.body.subSections});
-    try{
-        await newSection.save();
-        res.send("inserted data")
-    } catch(err){
-        console.log(err)
+    update = await BudgetSections.updateOne({
+        sectionName: req.body.sectionName, subSection: req.body.subSection
+        },  
+        {
+        sectionName: req.body.sectionName, subSection: req.body.subSections, isIncome: req.body.isIncome
+        },
+        {upsert: true})
+    if(update.upsertedCount){
+        res.send(update.upsertedCount+" section added")
+    } else {
+        res.send("No section added, requested section already exists")
     }
 })
 
