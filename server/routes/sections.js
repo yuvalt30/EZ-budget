@@ -1,13 +1,6 @@
 const express = require('express')
 const BudgetSections = require('../models/BudgetSections')
 const router = express.Router()
-var bodyParser = require('body-parser')
-
-// create application/x-www-form-urlencoded parser
-const urlencodedParser = bodyParser.urlencoded({ extended: false })
-
-// create application/json parser
-var jsonParser = bodyParser.json()
 
 // get all sections, no subs
 router.get('/', async (req, res)=>{
@@ -23,7 +16,6 @@ router.get('/subs', async (req, res)=>{
 
 // create new section
 router.post('/',  async (req, res)=>{
-    console.log(req.body+" , "+req.body.subSection)
     update = await BudgetSections.updateOne({
         sectionName: req.body.sectionName, subSection: req.body.subSection
         },  
@@ -32,7 +24,7 @@ router.post('/',  async (req, res)=>{
         },
         {upsert: true})
     if(update.upsertedCount){
-        res.send(update.upsertedCount+" section added")
+        res.status(201).send(update.upsertedCount+" section added")
     } else {
         res.send("No section added, requested section already exists")
     }
