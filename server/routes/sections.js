@@ -4,6 +4,12 @@ const BudgetSections = require('../models/BudgetSections')
 const router = express.Router()
 // router.use(express.json())
 
+// get all sections, no subs
+router.get('/', async (req, res)=>{
+    sectionsNames = await BudgetSections.getSections()
+    res.send(sectionsNames)
+})
+
 // get specific section's subs
 router.get('/subs', async (req, res)=>{
     subs = await BudgetSections.getSubs(req.query.sectionName)
