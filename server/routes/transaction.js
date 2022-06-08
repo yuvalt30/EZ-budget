@@ -10,11 +10,14 @@ router.get('/', async (req, res)=>{
 
 // create new transaction
 router.post('/', async (req, res)=>{
-    const newTransaction = new Transacion({sectionName: req.body.sectionName, subSections: req.body.subSections, amount: req.body.amount});
+    const newTransaction = new Transacion({section: req.body.section, amount: req.body.amount});
+    if(req.body.date) newTransaction.date = req.body.date
     try{
         await newTransaction.save();
+        res.status(201).send()
     } catch(err){
         console.log(err)
+        res.status(500).send()
     }
 })
 
