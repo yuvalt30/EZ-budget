@@ -16,6 +16,6 @@ const BudgetSectionSchema = new mongoose.Schema({
 });
 
 BudgetSectionSchema.static('getSections', function() { return this.find({ }).select({sectionName:true}).distinct('sectionName') });
-BudgetSectionSchema.static('getSubs', function(aSectionName) { return this.find({ sectionName: aSectionName}) });
+BudgetSectionSchema.static('getSubs', function(aSectionName) { return this.find({ sectionName: aSectionName}, 'subSection' ) });
 
 module.exports = mongoose.model("BudgetSection", BudgetSectionSchema)

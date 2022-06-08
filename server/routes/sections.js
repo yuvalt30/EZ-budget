@@ -15,19 +15,31 @@ router.get('/subs', async (req, res)=>{
 })
 
 // create new section
-router.post('/',  async (req, res)=>{
-    update = await BudgetSections.updateOne({
-        sectionName: req.body.sectionName, subSection: req.body.subSection
-        },  
-        {
-        sectionName: req.body.sectionName, subSection: req.body.subSections, isIncome: req.body.isIncome
-        },
-        {upsert: true})
-    if(update.upsertedCount){
-        res.status(201).send(update.upsertedCount+" section added")
-    } else {
-        res.send("No section added, requested section already exists")
-    }
+router.post('/', async (req, res)=>{
+    section = req.body.sectionName
+    subs = req.body.subSections
+    console.log(section +'\n'+ subs+' '+subs[0].name)
+    dups=0
+    inserted=0
+    await Promise.all(subs.map(async sub => {
+        console.log(sub.name)
+        update = await BudgetSections.updateOne({
+            sectionName: section, subSection: sub.name
+            },  
+            {
+                sectionName: section, subSection: sub.name, isIncome: sub.isIncome
+            },
+            {upsert: true})
+        console.log(update)
+        if(update.upsertedCount){
+            inserted += update.upsertedCount
+        } else {
+            dups += 1
+        }        
+    }));
+    msg = dups ? inserted+" inserted, "+dups+" sections already exist" : "all "+subs.length+" sections added" 
+    res.status(201).send(msg)
+
 })
 
 // TODO: create new sections from CSV file
