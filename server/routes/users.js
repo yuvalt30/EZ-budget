@@ -11,19 +11,18 @@ async function getUserByEmail(anEmail) {
     return await Users.findOne({email: anEmail})
 }
 
-router.get('/ismailexsist',async  (req, res) => {
-    console.log(req.params.email)
-    res.json(await getUserByEmail(req.params.email))
-})
+// router.get('/ismailexsist',async  (req, res) => {
+//     console.log(req.params.email)
+//     res.json(await getUserByEmail(req.params.email))
+// })
 // const initializePassport = require('./passport-config')
 // const { Router } = require('express')
 // initializePassport(passport,getUserByEmail,getUserById)
 
 // get all sections, no subs
 router.get('/sections', authenticateToken, async (req, res)=>{
-    sectionsNames = await BudgetSections.getSections()
     user = await Users.findById(req.user.id, 'permissions role -_id')
-    if(user.role == 'ceo' || user.role == 'admin') res.send(sectionsNames)
+    if(user.role == 'ceo' || user.role == 'admin') res.send(await BudgetSections.getSections())
     else res.send(user.permissions)
 
 })
@@ -53,7 +52,7 @@ router.post('/login', /*checkNotAuthenticated,*/ async (req, res) => {
 
 router.post('/register',/*checkNotAuthenticated,*/ async (req, res)=> {
     try{
-        user = await getUserByEmail(email)
+        if(await getUserByEmail(req.body.email)) res.status(400).send("email already exist")
         const hashedPassword = await bcrypt.hash(req.body.password, 10)
         const newUser = new Users({
             name: req.body.name,
@@ -75,6 +74,13 @@ router.post('/register',/*checkNotAuthenticated,*/ async (req, res)=> {
         username: req.body.username, password: req.body.password})
         await user.save()
         res.status(201).send()
+})
+
+router.delete('/', async (req, res) => {
+    if(await getUserByEmail(req.body.email)) {
+        await Users.deleteOne({email: req.body.email})
+        res.send(req.body.email+" user deleted")
+    } else res.status(400).send("email doesn't exist")
 })
 
 router.delete('/logout', (req, res) => {

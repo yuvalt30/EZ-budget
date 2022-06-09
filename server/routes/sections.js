@@ -11,53 +11,67 @@ router.get('/', async (req, res)=>{
 })
 
 // get specific section's subs
-router.get('/subs', async (req, res)=>{
-    subs = await BudgetSections.getSubs(req.query.sectionName)
+router.get('/:section', async (req, res)=>{
+    subs = await BudgetSections.getSubs(req.params.section)
     res.send(subs)
 })
 
-router.post('/del', async (res, req) => { //TODO
-    console.log(req)
+router.delete('/', async (req, res) => { //TODO
+    
+    console.log(req.body+'\n############\n')
     console.log(req.body.sectionsNames)
     console.log(req.body.subIds)
 
     secsNames = req.body.sectionsNames
     subs = req.body.subIds
-    await Promise.all(secsNames.map(async sec => {
-        await BudgetSections.deleteMany({sectionName: sec})
-    }))
-    await Promise.all(subs.map(async sub => {
-        await BudgetSections.findByIdAndDelete(sub)
-    }))
+    try{
+        await Promise.all(secsNames.map(async sec => {
+            await BudgetSections.deleteMany({sectionName: sec})
+        }))
+        await Promise.all(subs.map(async sub => {
+            await BudgetSections.findByIdAndDelete(sub)
+        }))
+        res.status(200).send()
+    } catch(e) {
+        res.status(500).send(e)
+    }
 })
 
-// create new section
-router.post('/', async (req, res)=>{
-    section = req.body.sectionName
-    subs = req.body.subSections
-    console.log(req)
-    console.log('\n##### req-body #####\n'+req.body)
-    console.log(section +'\n'+ subs+' '+subs[0].name)
-    dups=0
+async function createNewSection(section, subs, isIncome) {
     inserted=0
+    dups=0
     await Promise.all(subs.map(async sub => {
-        console.log(sub.name)
         update = await BudgetSections.updateOne({
-            sectionName: section, subSection: sub.name
+            sectionName: section, subSection: sub
             },  
             {
-                sectionName: section, subSection: sub.name, isIncome: sub.isIncome
+                sectionName: section, subSection: sub, isIncome: isIncome
             },
             {upsert: true})
         console.log(update)
-        if(update.upsertedCount){
-            inserted += update.upsertedCount
-        } else {
-            dups += 1
-        }        
+        if(update.upsertedCount) {inserted += 1}
+        else {dups += 1}       
     }));
-    msg = dups ? inserted+" inserted, "+dups+" sections already exist" : "all "+subs.length+" sections added" 
-    res.status(201).send(msg)
+    return [inserted,dups]
+}
+
+// create new section
+router.post('/', async (req, res)=>{
+    created=0
+    dup=0
+    if(req.body.incomes)
+        await Promise.all(req.body.incomes.map(async incomeSection => {
+            result = await createNewSection(incomeSection.sectionName, incomeSection.subSections, true)
+            created+=result[0]
+            dup+=result[1]
+        }))
+    if(req.body.outcomes)
+        await Promise.all(req.body.outcomes.map(async outcomeSection => {
+            result = await createNewSection(outcomeSection.sectionName, outcomeSection.subSections, false)
+            created+=result[0]
+            dup+=result[1]
+        }))
+    res.status(201).send(/*created+" section were created, "+dups+" already existed"*/)
 
 })
 

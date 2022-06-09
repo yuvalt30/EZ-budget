@@ -13,7 +13,7 @@ router.get('/test', async (req, res)=>{
 })
 
 
-// get general  year reflection of each section, as sum of its sub sections
+// get general  year reflection of all sections, each section as sum of its sub sections
 router.get('/', async (req, res)=>{
     result = []
     secs = await BudgetSections.getSections()
@@ -30,20 +30,31 @@ router.get('/', async (req, res)=>{
         newExec = new SectionTrack({})
         result.push(exec)
     }))
-    res.send(result)
+    return result
 })
 
-// get  year reflection for given sub section
-router.get('/section', async (req, res)=>{
+// get  year reflection for given section, showing each of its subs
+router.get('/:subId', async (req, res)=>{
     try{
-    const trans = await Tran.getTransactionsBySubId(req.query.subId, req.query.year)
-    exec = helper.generateExecFromTransArray(trans)
-    newExec = new SubTrack({})
-    }catch(err){
-        console.log(err)
-        res.send(err)
+    const subReflection = await getTrackForSub(req.params.subId, req.query.year)
+    res.send(subReflection)
+    } catch(e) {
+        res.status(500).send(e)
     }
+    
 })
+
+async function getTrackForSub(subId, year){
+    try{
+        const trans = await Tran.getTransactionsBySubIdAsync(subId, year)
+        exec = helper.generateExecFromTransArray(trans)
+        // newExec = new SubTrack({})
+        res.send(exec)
+        }catch(err){
+            console.log(err)
+            res.status(500).send(err)
+        }
+}
 
 // create new section
 router.post('/', async (req, res)=>{
