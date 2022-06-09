@@ -11,10 +11,10 @@ async function getUserByEmail(anEmail) {
     return await Users.findOne({email: anEmail})
 }
 
-async function getUserById(id){
-    return await Users.findById(id)
-}
-
+router.get('/ismailexsist',async  (req, res) => {
+    console.log(req.params.email)
+    res.json(await getUserByEmail(req.params.email))
+})
 // const initializePassport = require('./passport-config')
 // const { Router } = require('express')
 // initializePassport(passport,getUserByEmail,getUserById)
@@ -53,7 +53,7 @@ router.post('/login', /*checkNotAuthenticated,*/ async (req, res) => {
 
 router.post('/register',/*checkNotAuthenticated,*/ async (req, res)=> {
     try{
-        console.log(req.body)
+        user = await getUserByEmail(email)
         const hashedPassword = await bcrypt.hash(req.body.password, 10)
         const newUser = new Users({
             name: req.body.name,
