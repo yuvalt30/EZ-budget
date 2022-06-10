@@ -23,16 +23,8 @@ async function createNewTransaction(section, amount, description, date){
 
 // create new transaction manually
 router.post('/', async (req, res)=>{
-    inserted=0
-    err=0
-    console.log(req.body.transactions)
-    await Promise.all(req.body.transactions.map(async tran => {
-        if (createNewTransaction(tran.section, tran.amount, tran.description, tran.date)) inserted+=1
-        else err +=1
-    }))
-    if(inserted){
-        res.status(201).send(err ? inserted+" inserted, "+err+" errors" : "all "+inserted+" transactions inserted")
-    }
+    if (createNewTransaction(req.body.section, req.body.amount, req.body.description, req.body.date)) res.status(201).send()
+    else res.status(500).send()
 })
 
 // create many transaction from CSV file
@@ -40,12 +32,14 @@ router.post('/file', async (req, res)=>{
     inserted=0
     err=0
     await Promise.all(req.body.transactions.map(async tran => {
-        if (createNewTransaction(await Sections.getSubIdByNames(tran.sectionName, tran.subSection), tran.amount, tran.description, tran.date)) inserted+=1
-        else err +=1
+        secId = await Sections.getSubIdByNames(tran.sectionName, tran.subSection)
+        if(secId == null) err+=1
+        else if (createNewTransaction(secId, tran.amount, tran.description, tran.date)) inserted+=1
+            else err +=1
     }))
     if(inserted){
         res.status(201).send(err ? inserted+" inserted, "+err+" errors" : "all "+inserted+" transactions inserted")
-    }
+    } else res.status(400).send("all "+err+" insertions failed")
 })
 
 module.exports = router

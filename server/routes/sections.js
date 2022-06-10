@@ -51,7 +51,7 @@ async function createNewSection(section, subs, isIncome) {
     return [inserted,dups]
 }
 
-// create new section
+// create new section, manually or from CSV file
 router.post('/', async (req, res)=>{
     created=0
     dup=0
@@ -70,7 +70,5 @@ router.post('/', async (req, res)=>{
     res.status(201).send(/*created+" section were created, "+dups+" already existed"*/)
 
 })
-
-// TODO: create new sections from CSV file
 
 module.exports = router
