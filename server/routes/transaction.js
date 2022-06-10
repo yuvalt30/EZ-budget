@@ -1,5 +1,6 @@
 const express = require('express')
 const Transacion = require('../models/Transaction')
+const Sections = require('../models/BudgetSections')
 const router = express.Router()
 
 // get all Transactions
@@ -8,19 +9,43 @@ router.get('/', async (req, res)=>{
     res.send(allTransactions)
 })
 
-// create new transaction
-router.post('/', async (req, res)=>{
-    const newTransaction = new Transacion({section: req.body.section, amount: req.body.amount});
-    if(req.body.date) newTransaction.date = req.body.date
+async function createNewTransaction(section, amount, description, date){
+    const newTransaction = new Transacion({section: section, amount: amount});
+    if(date) newTransaction.date = date
+    if(description) newTransaction.description = description
     try{
         await newTransaction.save();
-        res.status(201).send()
+        return true
     } catch(err){
-        console.log(err)
-        res.status(500).send()
+        return false
+    }
+}
+
+// create new transaction manually
+router.post('/', async (req, res)=>{
+    inserted=0
+    err=0
+    console.log(req.body.transactions)
+    await Promise.all(req.body.transactions.map(async tran => {
+        if (createNewTransaction(tran.section, tran.amount, tran.description, tran.date)) inserted+=1
+        else err +=1
+    }))
+    if(inserted){
+        res.status(201).send(err ? inserted+" inserted, "+err+" errors" : "all "+inserted+" transactions inserted")
     }
 })
 
-//TODO: create many transaction from CSV file
+// create many transaction from CSV file
+router.post('/file', async (req, res)=>{
+    inserted=0
+    err=0
+    await Promise.all(req.body.transactions.map(async tran => {
+        if (createNewTransaction(await Sections.getSubIdByNames(tran.sectionName, tran.subSection), tran.amount, tran.description, tran.date)) inserted+=1
+        else err +=1
+    }))
+    if(inserted){
+        res.status(201).send(err ? inserted+" inserted, "+err+" errors" : "all "+inserted+" transactions inserted")
+    }
+})
 
 module.exports = router

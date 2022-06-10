@@ -2,7 +2,7 @@ const express = require('express')
 const user = require('./users')
 const BudgetSections = require('../models/BudgetSections')
 const router = express.Router()
-// router.use(express.json())
+
 
 // get all sections, no subs
 router.get('/', async (req, res)=>{
@@ -16,12 +16,8 @@ router.get('/:section', async (req, res)=>{
     res.send(subs)
 })
 
-router.delete('/', async (req, res) => { //TODO
+router.delete('/', async (req, res) => {
     
-    console.log(req.body+'\n############\n')
-    console.log(req.body.sectionsNames)
-    console.log(req.body.subIds)
-
     secsNames = req.body.sectionsNames
     subs = req.body.subIds
     try{

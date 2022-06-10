@@ -30,7 +30,7 @@ router.get('/', async (req, res)=>{
         newExec = new SectionTrack({})
         result.push(exec)
     }))
-    return result
+    res.send(result)
 })
 
 // get  year reflection for given section, showing each of its subs

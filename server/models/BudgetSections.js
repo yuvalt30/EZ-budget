@@ -17,5 +17,9 @@ const BudgetSectionSchema = new mongoose.Schema({
 
 BudgetSectionSchema.static('getSections', function() { return this.find({ }).select({sectionName:true}).distinct('sectionName') });
 BudgetSectionSchema.static('getSubs', function(aSectionName) { return this.find({ sectionName: aSectionName}, 'subSection isIncome' ) });
+BudgetSectionSchema.static('getSubIdByNames', async function(section, sub) { 
+    id = await this.find({ sectionName: section, subSection: sub}, '_id' )
+    return id[0]._id
+ });
 
 module.exports = mongoose.model("BudgetSection", BudgetSectionSchema)
