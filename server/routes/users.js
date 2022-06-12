@@ -36,7 +36,6 @@ router.post('/login', async (req, res) => {
     // Auth
     const email = req.body.email
     var user = await getUserByEmail(email)
-    console.log("login:\n"+user)
     if(user == null) {res.status(404).send('Email or password is incorrect.');return}
     try {
         if (await bcrypt.compare(req.body.password, user.password)) {
@@ -53,7 +52,6 @@ router.post('/login', async (req, res) => {
 
 router.post('/register',/*checkNotAuthenticated,*/ async (req, res)=> {
     try{
-        console.log(req.body)
         if(await getUserByEmail(req.body.email)) {res.status(400).send("email already exist"); return}
         const hashedPassword = await bcrypt.hash(req.body.password, 10)
         const newUser = new Users({
@@ -63,14 +61,10 @@ router.post('/register',/*checkNotAuthenticated,*/ async (req, res)=> {
             role: req.body.role,
             permissions: req.body.permissions
         })       
-        console.log(newUser)
         await newUser.save()
         console.log("newUser created")
-
-        // res.redirect('/login')
         res.status(201).send()
     } catch(e) {
-        // res.redirect('/register')
         res.status(500).send(e)
     }
     
