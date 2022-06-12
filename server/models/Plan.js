@@ -9,10 +9,6 @@ const PlanSchema = new mongoose.Schema({
     monthlyAmount : {
         type: Number,
         required: true,
-    },
-    year: {
-        type: Number,
-        required: true
     }
 });
 

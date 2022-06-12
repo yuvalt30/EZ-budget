@@ -3,10 +3,12 @@ const usersSchema = new mongoose.Schema({
     name: {
         type:String,
         required:true,
+        default:"anonymous"
     },
     email: {
         type:String,
         required:true,
+        lowercase: true,
     },
     password: {
         type:String,
@@ -14,11 +16,11 @@ const usersSchema = new mongoose.Schema({
     },
     role: {
         type:String,
-        required:true
+        required:true,
+        default:"employee"
     },
     permissions: {
         type:[String],
-
     }
 })
 

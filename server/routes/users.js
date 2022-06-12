@@ -8,7 +8,7 @@ const jwt = require('jsonwebtoken')
 
 
 async function getUserByEmail(anEmail) {
-    return await Users.findOne({email: anEmail})
+    return await Users.findOne({email: anEmail.toLowerCase()})
 }
 
 // router.get('/ismailexsist',async  (req, res) => {
@@ -32,11 +32,12 @@ router.get('/', authenticateToken, async (req, res) => {
     res.json( await Users.findById(req.user.id)) 
 })
 
-router.post('/login', /*checkNotAuthenticated,*/ async (req, res) => {
+router.post('/login', async (req, res) => {
     // Auth
     const email = req.body.email
-    user = await getUserByEmail(email)
-    if(user == null) res.status(404).send('Email or password is incorrect.')
+    var user = await getUserByEmail(email)
+    console.log("login:\n"+user)
+    if(user == null) {res.status(404).send('Email or password is incorrect.');return}
     try {
         if (await bcrypt.compare(req.body.password, user.password)) {
             const anUser = { id: user._id.toString()}
@@ -52,7 +53,8 @@ router.post('/login', /*checkNotAuthenticated,*/ async (req, res) => {
 
 router.post('/register',/*checkNotAuthenticated,*/ async (req, res)=> {
     try{
-        if(await getUserByEmail(req.body.email)) res.status(400).send("email already exist")
+        console.log(req.body)
+        if(await getUserByEmail(req.body.email)) {res.status(400).send("email already exist"); return}
         const hashedPassword = await bcrypt.hash(req.body.password, 10)
         const newUser = new Users({
             name: req.body.name,
@@ -60,14 +62,16 @@ router.post('/register',/*checkNotAuthenticated,*/ async (req, res)=> {
             email: req.body.email,
             role: req.body.role,
             permissions: req.body.permissions
-        })
+        })       
         console.log(newUser)
         await newUser.save()
+        console.log("newUser created")
+
         // res.redirect('/login')
         res.status(201).send()
-    } catch {
+    } catch(e) {
         // res.redirect('/register')
-        res.status(500).send()
+        res.status(500).send(e)
     }
     
     const user = new Users({

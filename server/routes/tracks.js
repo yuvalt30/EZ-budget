@@ -5,11 +5,9 @@ const subTrack = require('../models/SubTrack')
 const router = express.Router()
 const helper = require('./helper')
 const Tran = require('../models/Transaction')
-const SectionTrack = require('../models/SectionTrack')
-const SubTrack = require('../models/SubTrack')
 
-router.get('/test', async (req, res)=>{
-    res.send(await Tran.getTransactionsBySubIdAsync('6295090066b45d3af17cdc97', req.query.year))
+router.get('/test/:name', async (req, res)=>{
+    res.send(await BudgetSections.getSectionBudget(req.params.name))
 })
 
 
