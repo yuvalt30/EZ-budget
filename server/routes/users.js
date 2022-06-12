@@ -21,9 +21,19 @@ async function getUserByEmail(anEmail) {
 
 // get all sections, no subs
 router.get('/sections', authenticateToken, async (req, res)=>{
+    secs = []
     user = await Users.findById(req.user.id, 'permissions role -_id')
-    if(user.role == 'ceo' || user.role == 'admin') res.send(await BudgetSections.getSections())
-    else res.send(user.permissions)
+    if(user.role == 'ceo' || user.role == 'admin') {
+        res.send(await BudgetSections.getSections())
+        return
+    } else {
+        // await Promise.all(user.permissions.map(async sec => {
+        //     let perm = {sectionName: sec, subSections: await BudgetSections.getSubsNames(sec)}
+        //     console.log(perm)
+        //     secs.push(perm)
+        // }))
+        res.send(await BudgetSections.getSubsNamesFromArray(user.permissions))
+    }
 
 })
 
