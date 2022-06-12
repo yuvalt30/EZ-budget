@@ -21,7 +21,11 @@ const BudgetSectionSchema = new mongoose.Schema({
 
 BudgetSectionSchema.static('getSections', function() { return this.find({ }).select({sectionName:true}).distinct('sectionName') });
 BudgetSectionSchema.static('getSubs', function(aSectionName) { return this.find({ sectionName: aSectionName}, 'subSection isIncome budget -_id' ) });
-BudgetSectionSchema.static('getSubsNamesFromArray', function(secsArray) { 
+BudgetSectionSchema.static('getSubsNamesFromArray', function(secsArray) {
+    if(secsArray.length == 0)
+    return this.aggregate([
+        { $group : { _id: "$sectionName", subSections: { $push: "$subSection"}}}
+    ])
     return this.aggregate([
         { $match : { "sectionName" : {$in: secsArray}}},
         { $group : { _id: "$sectionName", subSections: { $push: "$subSection"}}}

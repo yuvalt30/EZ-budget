@@ -24,7 +24,7 @@ router.get('/sections', authenticateToken, async (req, res)=>{
     secs = []
     user = await Users.findById(req.user.id, 'permissions role -_id')
     if(user.role == 'ceo' || user.role == 'admin') {
-        res.send(await BudgetSections.getSections())
+        res.send(await BudgetSections.getSubsNamesFromArray([]))
         return
     } else {
         // await Promise.all(user.permissions.map(async sec => {
