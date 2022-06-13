@@ -24,11 +24,11 @@ BudgetSectionSchema.static('getSubs', function(aSectionName) { return this.find(
 BudgetSectionSchema.static('getSubsNamesFromArray', function(secsArray) {
     if(secsArray.length == 0)
     return this.aggregate([
-        { $group : { _id: "$sectionName", subSections: { $push: "$subSection"}}}
+        { $group : { _id: "$sectionName", subSections: { $push: {subSection: "$subSection", isIncome:"$isIncome", _id:"$_id"}}}}
     ])
     return this.aggregate([
         { $match : { "sectionName" : {$in: secsArray}}},
-        { $group : { _id: "$sectionName", subSections: { $push: "$subSection"}}}
+        { $group : { _id: "$sectionName", subSections: { $push: {subSection: "$subSection", isIncome:"$isIncome", _id:"$_id"}}}}
     ])
 });
 

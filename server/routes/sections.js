@@ -5,9 +5,14 @@ const router = express.Router()
 
 
 // get all sections, no subs
-router.get('/', async (req, res)=>{
+router.get('/names', async (req, res)=>{
     sectionsNames = await BudgetSections.getSections()
     res.send(sectionsNames)
+})
+
+// get all sections, WITH subs
+router.get('/', async (req, res)=>{
+    res.send(await BudgetSections.getSubsNamesFromArray([]))
 })
 
 // get specific section's subs
