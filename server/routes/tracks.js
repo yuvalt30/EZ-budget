@@ -16,16 +16,19 @@ router.get('/', async (req, res)=>{
     result = []
     secs = await BudgetSections.getSections()
     await Promise.all(secs.map(async (sec) => {
-        trans = await Tran.getTransactionsBySecNameAsync(sec, req.query.year)
-        divided = helper.divideTransByInOut(trans) // [inArray, outArray]
-        incomeExec = helper.generateExecFromTransArray(divided[0])
-        outcomeExec = helper.generateExecFromTransArray(divided[1])
-        exec = {
+        let trans = await Tran.getTransactionsBySecNameAsync(sec, req.query.year)
+        let divided = helper.divideTransByInOut(trans) // [inArray, outArray]
+        let plan = await BudgetSections.getSectionBudget(sec)
+        let exec = {
             section: sec,
-            income: incomeExec,
-            outcome: outcomeExec
+            // income: incomeExec,
+            // outcome: outcomeExec,
+            plan: plan
         }
-        newExec = new SectionTrack({})
+        if(plan.find(x => x._id === true))
+            exec.income = helper.generateExecFromTransArray(divided[0])
+        if(plan.find(x => x._id === false))
+            exec.outcome = helper.generateExecFromTransArray(divided[1])
         result.push(exec)
     }))
     res.send(result)

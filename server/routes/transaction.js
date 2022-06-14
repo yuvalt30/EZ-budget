@@ -30,16 +30,16 @@ router.post('/', async (req, res)=>{
 // create many transaction from CSV file
 router.post('/file', async (req, res)=>{
     inserted=0
-    err=0
+    e=0
     await Promise.all(req.body.transactions.map(async tran => {
         secId = await Sections.getSubIdByNames(tran.sectionName, tran.subSection)
-        if(secId == null) err+=1
+        if(secId == null) e+=1
         else if (createNewTransaction(secId, tran.amount, tran.description, tran.date)) inserted+=1
-            else err +=1
+            else e +=1
     }))
     if(inserted){
-        res.status(201).send(err ? inserted+" inserted, "+err+" errors" : "all "+inserted+" transactions inserted")
-    } else res.status(400).send("all "+err+" insertions failed")
+        res.status(201).send(e ? inserted+" inserted, "+e+" errors" : "all "+inserted+" transactions inserted")
+    } else res.status(400).send("all "+r+" insertions failed")
 })
 
 module.exports = router

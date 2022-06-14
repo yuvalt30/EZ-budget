@@ -49,12 +49,19 @@ async function createNewSection(section, subs, isIncome) {
                 sectionName: section, subSection: sub, isIncome: isIncome
             },
             {upsert: true})
-        console.log(update)
         if(update.upsertedCount) {inserted += 1}
         else {dups += 1}       
     }));
     return [inserted,dups]
 }
+
+router.put('/:subId-:amount', async (req, res) => {
+    try{
+        ans = await BudgetSections.findByIdAndUpdate(req.params.subId,{"budget": req.params.amount}, {new: true})
+        console.log(ans)
+        res.status(200).send()
+    } catch {res.status(500).send()}
+})
 
 // create new section, manually or from CSV file
 router.post('/', async (req, res)=>{

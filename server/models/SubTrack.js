@@ -11,11 +11,6 @@ const SubTrackSchema = new mongoose.Schema({
         required: true,
         default: new Date().getFullYear()
     },
-    monthlyPlan: {
-        type: Number,
-        required: true,
-        default: 0
-    },
     exec: { 
         type: Array,
         required: true,

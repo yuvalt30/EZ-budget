@@ -40,9 +40,14 @@ BudgetSectionSchema.static('getSubIdByNames', async function(section, sub) {
     return id[0]._id
  });
  BudgetSectionSchema.static('getSectionBudget', function(aSectionName) { 
-    this.aggregate([
-        { $match: { ectionName: aSectionName } },
-        { $group: { _id: null, budget: { $sum: "$budget" } } }
+    return this.aggregate([
+        { $match: { "sectionName": aSectionName } },
+        { 
+            $group: {
+                _id: "$isIncome",
+                budget: { $sum: "$budget" }
+            } 
+        }
     ])
   });
 
