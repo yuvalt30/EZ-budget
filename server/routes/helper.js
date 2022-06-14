@@ -44,11 +44,18 @@ function monthDiff(startDate, endDate) {
     );
   }
 
-  async function transDateRange(subId) {
+  async function transDateRangeSubAsync(subId) {
     oldest = (await Tran.findOne({ section: subId}, {}, { sort: { 'date' : 1}})).date
     newest = (await Tran.findOne({ section: subId}, {}, { sort: { 'date' : -1}})).date
     return [oldest, newest, monthDiff(oldest, newest)]
 }
 
+async function transDateRangeSecAsync(secName) {
+    trans = await Tran.getTransactionsBySecNameAsync(secName).sort((a,b) => monthDiff(a.date, b.date))
+    newest = (await Tran.findOne({ section: subId}, {}, { sort: { 'date' : -1}})).date
+    return [oldest, newest, monthDiff(oldest, newest)]
+}
+
 module.exports = {generateExecFromTransArray,
-                divideTransByInOut,getSecTransBySubsAsync,monthDiff,transDateRange,}
+                divideTransByInOut,getSecTransBySubsAsync,monthDiff,
+                transDateRangeSubAsync,transDateRangeSecAsync,}

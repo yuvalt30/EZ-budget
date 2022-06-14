@@ -43,28 +43,28 @@ TransactionSchema.static('getTransactionsBySecAndSubAsync', async function(secNa
     return ret
      });
 
-TransactionSchema.static('getTransactionsBySubIdAsync', async function(subId, year) { 
-    if(year){
+TransactionSchema.static('getTransactionsBySubIdAsync', async function(subId, startDate, endDate) { 
+    // if(year){
         return await this.find({ section: subId, date: {
-            $gte: new Date(year, 0),
-            $lt: new Date(year, 11, 31, 23, 59)
+            $gte: startDate,
+            $lt: endDate
         }}).populate('section')
-    }else{
-        return await this.find({ section: subId }).populate('section')
-    }
+    // }else{
+    //     return await this.find({ section: subId }).populate('section')
+    // }
 });
 
-TransactionSchema.static('getTransactionsBySecNameAsync', async function(secName, year) {
-    if(year){
-        trans =  await this.find({ date: {
-            $gte: new Date(year, 0),
-            $lt: new Date(year, 11, 31, 23, 59) 
+TransactionSchema.static('getTransactionsBySecNameAsync', async function(secName, startDate, endDate) {
+    if(startDate && endDate){
+        trans = await this.find({ date: {
+            $gte: startDate,
+            $lt: endDate 
         }}).populate({
             path:'section',
             match: {sectionName: secName},
         })
     } else {
-        trans =  await this.find({}).populate({
+        trans =  await this.find({}).sort({date:-1}).populate({
             path:'section',
             match: {sectionName: secName},
         })
