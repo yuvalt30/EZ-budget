@@ -5,7 +5,7 @@ const router = express.Router()
 
 // get all Transactions
 router.get('/', async (req, res)=>{
-    const allTransactions = await Transacion.find({}).sort({date: 1})
+    const allTransactions = await Transacion.find({}).sort({date: -1})
     res.send(allTransactions)
 })
 

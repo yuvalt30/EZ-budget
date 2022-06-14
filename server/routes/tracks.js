@@ -7,9 +7,22 @@ const helper = require('./helper')
 const Tran = require('../models/Transaction')
 
 router.get('/test/:name', async (req, res)=>{
-    res.send(await helper.getSecTransBySubsAsync(req.params.name))
+    res.send(await helper.transDateRange(req.params.name))
 })
 
+router.get('/past', async (req, res) => {
+    sectionName = req.query.sectionName
+    subId = req.query.subId
+    if(subId){
+        range = await helper.transDateRange(subId) //  [  oldest, newest, diff  ]
+        begin = req.query.begin || range[0]
+        end = req.query.end || range[1]
+        past = new Array(range[2]).fill(0)
+
+    }
+    
+    
+})
 
 // get general current year reflection of all sections, each section as sum of its sub sections
 router.get('/', async (req, res)=>{
@@ -21,12 +34,16 @@ router.get('/', async (req, res)=>{
         let plan = await BudgetSections.getSectionBudget(sec)
         let exec = {
             section: sec,
-            plan: plan
+            // plan: plan
         }
-        if(plan.find(x => x._id === true))
+        if(p = plan.find(x => x._id === true)){
+            exec.incomeBudget = p.budget
             exec.income = helper.generateExecFromTransArray(divided[0])
-        if(plan.find(x => x._id === false))
+        }
+        if(p = plan.find(x => x._id === false)){
+            exec.outcomeBudget = p.budget
             exec.outcome = helper.generateExecFromTransArray(divided[1])
+        }
         result.push(exec)
     }))
     res.send(result)
@@ -48,18 +65,6 @@ router.get('/:secName', async (req, res)=>{
         res.send(result)
     } catch(e) { res.status(500).send(e) }
 })
-
-async function getTrackForSubAsync(subId, year){
-    try{
-        const trans = await Tran.getTransactionsBySubIdAsync(subId, year)
-        exec = helper.generateExecFromTransArray(trans)
-        // newExec = new SubTrack({})
-        res.send(exec)
-        }catch(err){
-            console.log(err)
-            res.status(500).send(err)
-        }
-}
 
 // create new section
 router.post('/', async (req, res)=>{

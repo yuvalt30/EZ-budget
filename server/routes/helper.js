@@ -16,9 +16,7 @@ function generateExecFromTransArray(trans){
 
 async function getSecTransBySubsAsync(secName){
     return await Tran.aggregate([
-        // $match : {  }
         { $group : { _id: "$section", trans: { $push: {amount: "$amount", date: "$date"
-        //month: {$subtract: [ {$month: "$date"}, 1]}
          }}}},
          { $lookup: {
              from: "budgetsections",
@@ -38,4 +36,19 @@ async function getSecTransBySubsAsync(secName){
      ])
 }
 
-module.exports = {generateExecFromTransArray,divideTransByInOut,getSecTransBySubsAsync,}
+function monthDiff(startDate, endDate) {
+    return (
+      endDate.getMonth() -
+      startDate.getMonth() +
+      12 * (endDate.getFullYear() - startDate.getFullYear())
+    );
+  }
+
+  async function transDateRange(subId) {
+    oldest = (await Tran.findOne({ section: subId}, {}, { sort: { 'date' : 1}})).date
+    newest = (await Tran.findOne({ section: subId}, {}, { sort: { 'date' : -1}})).date
+    return [oldest, newest, monthDiff(oldest, newest)]
+}
+
+module.exports = {generateExecFromTransArray,
+                divideTransByInOut,getSecTransBySubsAsync,monthDiff,transDateRange,}
