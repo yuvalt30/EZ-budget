@@ -57,6 +57,7 @@ router.get('/:secName', async (req, res)=>{
         transBySubs.forEach(sub => {
             let exec = {
                 subSection: sub.subSection,
+                isIncome: sub.isIncome,
                 plan: sub.budget,
                 data: helper.generateExecFromTransArray(sub.trans)
             }
