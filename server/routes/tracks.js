@@ -7,7 +7,7 @@ const helper = require('./helper')
 const Tran = require('../models/Transaction')
 
 router.get('/test/:name', async (req, res)=>{
-    res.send(await BudgetSections.getSectionBudget(req.params.name))
+    res.send(await helper.getSecTransBySubsAsync(req.params.name))
 })
 
 
@@ -16,13 +16,11 @@ router.get('/', async (req, res)=>{
     result = []
     secs = await BudgetSections.getSections()
     await Promise.all(secs.map(async (sec) => {
-        let trans = await Tran.getTransactionsBySecNameAsync(sec, req.query.year)
+        let trans = await Tran.getTransactionsBySecNameAsync(sec)
         let divided = helper.divideTransByInOut(trans) // [inArray, outArray]
         let plan = await BudgetSections.getSectionBudget(sec)
         let exec = {
             section: sec,
-            // income: incomeExec,
-            // outcome: outcomeExec,
             plan: plan
         }
         if(plan.find(x => x._id === true))
@@ -35,14 +33,20 @@ router.get('/', async (req, res)=>{
 })
 
 // get  year reflection for given section, showing each of its subs
-router.get('/:subId', async (req, res)=>{
+router.get('/:secName', async (req, res)=>{
     try{
-    const subReflection = await getTrackForSubAsync(req.params.subId, req.query.year)
-    res.send(subReflection)
-    } catch(e) {
-        res.status(500).send(e)
-    }
-    
+        result = []
+        transBySubs = await helper.getSecTransBySubsAsync(req.params.secName)
+        transBySubs.forEach(sub => {
+            let exec = {
+                subSection: sub.subSection,
+                plan: sub.budget,
+                data: helper.generateExecFromTransArray(sub.trans)
+            }
+            result.push(exec)
+        })
+        res.send(result)
+    } catch(e) { res.status(500).send(e) }
 })
 
 async function getTrackForSubAsync(subId, year){
