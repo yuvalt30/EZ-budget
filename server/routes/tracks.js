@@ -14,7 +14,7 @@ router.get('/past', async (req, res) => {
     sectionName = req.query.sectionName
     subId = req.query.subId
     if(subId){
-        range = await helper.transDateRangeSubAsync(subId) //  [  oldest, newest, diff  ]
+        range = await helper.transDateRangeSubAsync(subId) //  [  oldest, newest, diff  ] TODO: optimize as in next if statement
         begin = req.query.begin ? new Date(req.query.begin) : range[0]
         end = req.query.end ? new Date(req.query.end) : range[1]
         past = new Array(range[2]+1).fill(0)
