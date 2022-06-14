@@ -22,8 +22,7 @@ async function getUserByEmail(anEmail) {
 // get all sections, no subs
 router.get('/sections', authenticateToken, async (req, res)=>{
     secs = []
-    user = await Users.findById(req.user.id, 'permissions role -_id')
-    if(user.role == 'ceo' || user.role == 'admin') {
+    if(req.user.role == 'ceo' || req.user.role == 'admin') {
         res.send(await BudgetSections.getSubsNamesFromArray([]))
         return
     } else {
@@ -32,7 +31,7 @@ router.get('/sections', authenticateToken, async (req, res)=>{
         //     console.log(perm)
         //     secs.push(perm)
         // }))
-        res.send(await BudgetSections.getSubsNamesFromArray(user.permissions))
+        res.send(await BudgetSections.getSubsNamesFromArray(req.user.permissions))
     }
 
 })
@@ -49,7 +48,7 @@ router.post('/login', async (req, res) => {
     if(user == null) {res.status(404).send('Email or password is incorrect.');return}
     try {
         if (await bcrypt.compare(req.body.password, user.password)) {
-            const anUser = { id: user._id.toString()}
+            const anUser = { role: user.role, permissions: user.permissions}
             const accesToken = jwt.sign(anUser, process.env.ACCESS_TOKEN_SECRET)
             res.json({accessToken: accesToken, name: user.name, role: user.role})
         } else {

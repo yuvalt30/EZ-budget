@@ -1,7 +1,7 @@
 const express = require('express')
 const BudgetSections = require('../models/BudgetSections')
-const sectionTrack = require('../models/SectionTrack')
-const subTrack = require('../models/SubTrack')
+// const sectionTrack = require('../models/SectionTrack')
+// const subTrack = require('../models/SubTrack')
 const router = express.Router()
 const helper = require('./helper')
 const Tran = require('../models/Transaction')
@@ -11,7 +11,7 @@ router.get('/test/:name', async (req, res)=>{
 })
 
 
-// get general  year reflection of all sections, each section as sum of its sub sections
+// get general current year reflection of all sections, each section as sum of its sub sections
 router.get('/', async (req, res)=>{
     result = []
     secs = await BudgetSections.getSections()
@@ -37,7 +37,7 @@ router.get('/', async (req, res)=>{
 // get  year reflection for given section, showing each of its subs
 router.get('/:subId', async (req, res)=>{
     try{
-    const subReflection = await getTrackForSub(req.params.subId, req.query.year)
+    const subReflection = await getTrackForSubAsync(req.params.subId, req.query.year)
     res.send(subReflection)
     } catch(e) {
         res.status(500).send(e)
@@ -45,7 +45,7 @@ router.get('/:subId', async (req, res)=>{
     
 })
 
-async function getTrackForSub(subId, year){
+async function getTrackForSubAsync(subId, year){
     try{
         const trans = await Tran.getTransactionsBySubIdAsync(subId, year)
         exec = helper.generateExecFromTransArray(trans)
