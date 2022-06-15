@@ -1,24 +1,10 @@
 if(process.env.NODE_ENV !== 'production'){
     require('dotenv').config()
 }
-const methodOverride = require('method-override')
-const passport = require('passport')
 const express = require("express")
 const mongoose = require("mongoose")
 const app = express()
-// app.use(express.urlencoded({extended: false}))
-const flash = require('express-flash')
-const session = require('express-session')
-app.use(flash())
-app.use(session({
-    secret: process.env.SESSION_SECRET,
-    resave: false,
-    saveUninitialized: false
-}))
-app.use(passport.initialize())
-app.use(passport.session())
 app.use(express.json())
-app.use(methodOverride('_method'))
 
 const indexRouter = require('./routes/index')
 const sectionsRouter = require('./routes/sections')
