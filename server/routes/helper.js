@@ -14,10 +14,17 @@ function generateExecFromTransArray(trans){
     return exec
 }
 
-async function getSecTransBySubsAsync(secName){
+async function getSecTransBySubsAsync(secName, begin, end){
     return await Tran.aggregate([
-        { $group : { _id: "$section", trans: { $push: {amount: "$amount", date: "$date"
-         }}}},
+        { $group : { _id: "$section", trans: { $push:
+            {
+                $cond:[
+                  { $and: [ {$gt: ["$date", begin] }, {$lt: ["$date", end] } ] },
+                  { amount: "$amount", date: "$date"},
+                  "$$REMOVE"
+              ]
+            }
+         }}},
          { $lookup: {
              from: "budgetsections",
              localField: "_id",
@@ -25,9 +32,8 @@ async function getSecTransBySubsAsync(secName){
              as: "subIdDocs"
          }},
          { $match: {
-             'subIdDocs': { $elemMatch: { sectionName : secName}},
-             //'date': { $gte: new ISODate("2014-01-01"), $lt: new ISODate("2015-01-01") }
-             }
+            'subIdDocs': { $elemMatch: { sectionName : secName}},
+         }
          },
          {
              $replaceRoot: { newRoot: { $mergeObjects: [ { $arrayElemAt: [ "$subIdDocs", 0 ] }, "$$ROOT" ] } }
@@ -44,18 +50,6 @@ function monthDiff(startDate, endDate) {
     );
   }
 
-  async function transDateRangeSubAsync(subId) {
-    oldest = (await Tran.findOne({ section: subId}, {}, { sort: { 'date' : 1}})).date
-    newest = (await Tran.findOne({ section: subId}, {}, { sort: { 'date' : -1}})).date
-    return [oldest, newest, monthDiff(oldest, newest)]
-}
-
-async function transDateRangeSecAsync(secName) {
-    trans = await Tran.getTransactionsBySecNameAsync(secName).sort((a,b) => monthDiff(a.date, b.date))
-    newest = (await Tran.findOne({ section: subId}, {}, { sort: { 'date' : -1}})).date
-    return [oldest, newest, monthDiff(oldest, newest)]
-}
-
 module.exports = {generateExecFromTransArray,
                 divideTransByInOut,getSecTransBySubsAsync,monthDiff,
-                transDateRangeSubAsync,transDateRangeSecAsync,}
+                }

@@ -14,18 +14,18 @@ router.get('/past', async (req, res) => {
     sectionName = req.query.sectionName
     subId = req.query.subId
     if(subId){
-        range = await helper.transDateRangeSubAsync(subId) //  [  oldest, newest, diff  ] TODO: optimize as in next if statement
-        begin = req.query.begin ? new Date(req.query.begin) : range[0]
-        end = req.query.end ? new Date(req.query.end) : range[1]
-        past = new Array(range[2]+1).fill(0)
-        trans = await Tran.getTransactionsBySubIdAsync(subId, begin, end)
+        trans = await Tran.getTransactionsBySubIdAsync(subId)
+        begin = req.query.begin ? new Date(req.query.begin) : trans[trans.length-1].date
+        end = req.query.end ? new Date(req.query.end) : trans[0].date
+
+        past = new Array(helper.monthDiff(begin,end)+1).fill(0)
         trans.forEach(tran => {
             past[helper.monthDiff(begin, tran.date)] += tran.amount
         });
         res.send(past)
     }
     if(sectionName){
-        trans = await Tran.getTransactionsBySecNameAsync(sectionName)
+        trans = await Tran.getTransactionsBySecNameAsync(sectionName) // sorted
         // trans[0] - newest, trans[trans.length-1] - oldest
         begin = req.query.begin ? new Date(req.query.begin) : trans[trans.length-1].date
         end = req.query.end ? new Date(req.query.end) : trans[0].date
@@ -68,7 +68,7 @@ router.get('/', async (req, res)=>{
 router.get('/:secName', async (req, res)=>{
     try{
         result = []
-        transBySubs = await helper.getSecTransBySubsAsync(req.params.secName) // TODO add date restrictions
+        transBySubs = await helper.getSecTransBySubsAsync(req.params.secName, new Date(new Date().getFullYear(),0), new Date(new Date().getFullYear()+1,0))
         transBySubs.forEach(sub => {
             let exec = {
                 subSection: sub.subSection,

@@ -19,7 +19,7 @@ const TransactionSchema = new mongoose.Schema({
     }
 });
 
-TransactionSchema.static('getTransactionsBySecAndSubAsync', async function(secName, subName, year) {
+TransactionSchema.static('getTransactionsBySecAndSubAsync', async function(secName, subName, year) { // TODO: redundunt?
     if(year){
         trans = await this.find({ }).populate({
             path: 'section',
@@ -44,14 +44,14 @@ TransactionSchema.static('getTransactionsBySecAndSubAsync', async function(secNa
      });
 
 TransactionSchema.static('getTransactionsBySubIdAsync', async function(subId, startDate, endDate) { 
-    // if(year){
+    if(startDate && endDate){
         return await this.find({ section: subId, date: {
             $gte: startDate,
             $lt: endDate
         }}).populate('section')
-    // }else{
-    //     return await this.find({ section: subId }).populate('section')
-    // }
+    }else{
+        return await this.find({ section: subId }).sort({date:-1}).populate('section')
+    }
 });
 
 TransactionSchema.static('getTransactionsBySecNameAsync', async function(secName, startDate, endDate) {
