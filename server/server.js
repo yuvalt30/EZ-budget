@@ -4,7 +4,10 @@ if(process.env.NODE_ENV !== 'production'){
 const express = require("express")
 const mongoose = require("mongoose")
 const app = express()
+var cors = require('cors')
+
 app.use(express.json())
+app.use(cors())
 
 const indexRouter = require('./routes/index')
 const sectionsRouter = require('./routes/sections')
@@ -26,7 +29,7 @@ app.use('/tracks', tracksRouter)
 app.use('/transactions', transactionsRouter)
 app.use('/users', usersRouter)
 
-const port = process.env.PORT || 3001
+const port = process.env.PORT || 5000
 app.listen(port, ()=>{
     console.log("server is listening on port " + port)
 })
