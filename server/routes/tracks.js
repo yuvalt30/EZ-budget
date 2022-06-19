@@ -76,16 +76,15 @@ router.get('/', async (req, res)=>{
 // get  year reflection for given section, showing each of its subs
 router.get('/:secName', async (req, res)=>{
     try{
-        result = []
+        result = { income: [], outcome: []}
         transBySubs = await helper.getSecTransBySubsAsync(req.params.secName, new Date(new Date().getFullYear(),0), new Date(new Date().getFullYear()+1,0))
         transBySubs.forEach(sub => {
             let exec = {
                 subSection: sub.subSection,
-                isIncome: sub.isIncome,
                 plan: sub.budget,
                 data: helper.generateExecFromTransArray(sub.trans)
             }
-            result.push(exec)
+            sub.isIncome ? result.income.push(exec) : result.outcome.push(exec)
         })
         res.send(result)
     } catch(e) { res.status(500).send(e) }
