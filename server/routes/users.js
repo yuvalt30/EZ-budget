@@ -70,6 +70,12 @@ router.post('/register',/*checkNotAuthenticated,*/ async (req, res)=> {
             role: req.body.role,
             permissions: req.body.permissions
         })
+        if(newUser.role == 'employee' && (newUser.permissions == null || newUser.permissions.length == 0)){
+            res.status(400).send("An employee must have permissions"); return
+        }
+        if(newUser.email == null || newUser.email.length == 0){
+            res.status(400).send("Valid e-mail is required"); return
+        }
         console.log(newUser)       
         await newUser.save()
         console.log("newUser created")
