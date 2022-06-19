@@ -69,12 +69,13 @@ router.post('/register',/*checkNotAuthenticated,*/ async (req, res)=> {
             email: req.body.email,
             role: req.body.role,
             permissions: req.body.permissions
-        })       
+        })
+        console.log(newUser)       
         await newUser.save()
         console.log("newUser created")
         res.status(201).send()
     } catch(e) {
-        res.status(500).send(e)
+        res.status(400).send(e)
     }
     
     const user = new Users({

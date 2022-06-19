@@ -45,25 +45,30 @@ router.get('/past', async (req, res) => {
 
 // get general current year reflection of all sections, each section as sum of its sub sections
 router.get('/', async (req, res)=>{
-    result = []
+    result = { income: [], outcome: []}
     secs = await BudgetSections.getSections()
     await Promise.all(secs.map(async (sec) => {
         let trans = await Tran.getTransactionsBySecNameAsync(sec, new Date(new Date().getFullYear(),0), new Date(new Date().getFullYear()+1,0))  //  (secName, startDate, endDate)
         let divided = helper.divideTransByInOut(trans) // [inArray, outArray]
         let plan = await BudgetSections.getSectionBudget(sec)
-        let exec = {
-            section: sec,
-            // plan: plan
-        }
+        
         if(p = plan.find(x => x._id === true)){
+            let exec = {
+                section: sec,
+            }
             exec.incomeBudget = p.budget
             exec.income = helper.generateExecFromTransArray(divided[0])
+            result.income.push(exec)
         }
         if(p = plan.find(x => x._id === false)){
+            let exec = {
+                section: sec,
+            }
             exec.outcomeBudget = p.budget
             exec.outcome = helper.generateExecFromTransArray(divided[1])
+            result.outcome.push(exec)
         }
-        result.push(exec)
+        // result.push(exec)
     }))
     res.send(result)
 })
