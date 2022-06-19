@@ -20,9 +20,11 @@ router.get('/past', async (req, res) => {
 
         past = new Array(helper.monthDiff(begin,end)+1).fill(0)
         trans.forEach(tran => {
-            past[helper.monthDiff(begin, tran.date)] += tran.amount
+            if(tran.date >= begin && tran.date <= end)
+                past[helper.monthDiff(begin, tran.date)] += tran.amount
         });
         res.send(past)
+        return
     }
     if(sectionName){
         trans = await Tran.getTransactionsBySecNameAsync(sectionName) // sorted
@@ -36,7 +38,9 @@ router.get('/past', async (req, res) => {
                 past[helper.monthDiff(begin, tran.date)] += tran.amount
         });
         res.send(past)
-    }   
+        return
+    }
+    res.status(400).send()   
 })
 
 // get general current year reflection of all sections, each section as sum of its sub sections
