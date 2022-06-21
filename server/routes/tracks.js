@@ -58,7 +58,6 @@ function calcDates(queryStartMonth){
 router.get('/', async (req, res)=>{
     result = { income: [], outcome: []}
     dates = calcDates(req.query.startMonth)  //  [begin, end]
-    console.log(dates[0]+"\n"+dates[1])
     secs = await BudgetSections.getSections()
     await Promise.all(secs.map(async (sec) => {
         let trans = await Tran.getTransactionsBySecNameAsync(sec, dates[0], dates[1])  //  (secName, startDate, endDate)

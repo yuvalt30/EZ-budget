@@ -10,9 +10,7 @@ function generateExecFromTransArray(trans, startMonth){
     exec = [0,0,0,0,0,0,0,0,0,0,0,0,]
     console.log(startMonth)
     trans.forEach(tran => {
-        console.log("org "+(tran.date.getMonth() - startMonth))
         let idx = tran.date.getMonth() - startMonth >= 0 ? tran.date.getMonth() - startMonth : tran.date.getMonth() - startMonth + 12
-        console.log("new "+idx + "\n")
         exec[idx] += tran.amount
     })
     return exec
