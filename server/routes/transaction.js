@@ -38,8 +38,8 @@ router.post('/file', async (req, res)=>{
             else e +=1
     }))
     if(inserted){
-        res.status(201).send(e ? inserted+" inserted, "+e+" errors" : "all "+inserted+" transactions inserted")
-    } else res.status(400).send("all "+r+" insertions failed")
+        res.status(201).send(e ? inserted+" inserted, "+e+" errors, ensure section and sub section exist" : "all "+inserted+" transactions inserted")
+    } else res.status(400).send("all "+e+" insertions failed, ensure section and sub section exist")
 })
 
 module.exports = router

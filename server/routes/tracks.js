@@ -6,9 +6,9 @@ const router = express.Router()
 const helper = require('./helper')
 const Tran = require('../models/Transaction')
 
-router.get('/test/:name', async (req, res)=>{
-    res.send(await helper.transDateRange(req.params.name))
-})
+// router.get('/test/:name', async (req, res)=>{
+//     res.send(await helper.transDateRange(req.params.name))
+// })
 
 router.get('/past', async (req, res) => {
     sectionName = req.query.sectionName
@@ -46,12 +46,22 @@ router.get('/past', async (req, res) => {
     res.status(400).send()   
 })
 
+function calcDates(queryStartMonth){
+    startMonth = queryStartMonth ? queryStartMonth - 1 : 0
+    yearShift = new Date().getMonth() < startMonth ? -1 : 0
+    begin = new Date(new Date().getFullYear() + yearShift,startMonth)
+    end = new Date(new Date().getFullYear()+yearShift+1,startMonth)
+    return [begin,end]
+}
+
 // get general current year reflection of all sections, each section as sum of its sub sections
 router.get('/', async (req, res)=>{
     result = { income: [], outcome: []}
+    dates = calcDates(req.query.startMonth)  //  [begin, end]
+    console.log(dates[0]+"\n"+dates[1])
     secs = await BudgetSections.getSections()
     await Promise.all(secs.map(async (sec) => {
-        let trans = await Tran.getTransactionsBySecNameAsync(sec, new Date(new Date().getFullYear(),0), new Date(new Date().getFullYear()+1,0))  //  (secName, startDate, endDate)
+        let trans = await Tran.getTransactionsBySecNameAsync(sec, dates[0], dates[1])  //  (secName, startDate, endDate)
         let divided = helper.divideTransByInOut(trans) // [inArray, outArray]
         let plan = await BudgetSections.getSectionBudget(sec)
         
@@ -60,7 +70,7 @@ router.get('/', async (req, res)=>{
                 section: sec,
             }
             exec.incomeBudget = p.budget
-            exec.income = helper.generateExecFromTransArray(divided[0])
+            exec.income = helper.generateExecFromTransArray(divided[0], startMonth)
             result.income.push(exec)
         }
         if(p = plan.find(x => x._id === false)){
@@ -68,7 +78,7 @@ router.get('/', async (req, res)=>{
                 section: sec,
             }
             exec.outcomeBudget = p.budget
-            exec.outcome = helper.generateExecFromTransArray(divided[1])
+            exec.outcome = helper.generateExecFromTransArray(divided[1], startMonth)
             result.outcome.push(exec)
         }
         // result.push(exec)
@@ -77,15 +87,16 @@ router.get('/', async (req, res)=>{
 })
 
 // get  year reflection for given section, showing each of its subs
-router.get('/:secName', async (req, res)=>{
+router.get('/sec', async (req, res)=>{
     try{
         result = { income: [], outcome: []}
-        transBySubs = await helper.getSecTransBySubsAsync(req.params.secName, new Date(new Date().getFullYear(),0), new Date(new Date().getFullYear()+1,0))
+        dates = calcDates(req.query.startMonth)  //  [begin, end]
+        transBySubs = await helper.getSecTransBySubsAsync(req.query.secName,  dates[0], dates[1])
         transBySubs.forEach(sub => {
             let exec = {
                 subSection: sub.subSection,
                 plan: sub.budget,
-                data: helper.generateExecFromTransArray(sub.trans)
+                data: helper.generateExecFromTransArray(sub.trans, startMonth)
             }
             sub.isIncome ? result.income.push(exec) : result.outcome.push(exec)
         })
@@ -93,20 +104,20 @@ router.get('/:secName', async (req, res)=>{
     } catch(e) { res.status(500).send(e) }
 })
 
-// create new section
-router.post('/', async (req, res)=>{
-    update = await BudgetSections.updateOne({
-        sectionName: req.body.sectionName, subSection: req.body.subSection
-        },  
-        {
-        sectionName: req.body.sectionName, subSection: req.body.subSections, isIncome: req.body.isIncome
-        },
-        {upsert: true})
-    if(update.upsertedCount){
-        res.send(update.upsertedCount+" section added")
-    } else {
-        res.send("No section added, requested section already exists")
-    }
-})
+// // create new section
+// router.post('/', async (req, res)=>{
+//     update = await BudgetSections.updateOne({
+//         sectionName: req.body.sectionName, subSection: req.body.subSection
+//         },  
+//         {
+//         sectionName: req.body.sectionName, subSection: req.body.subSections, isIncome: req.body.isIncome
+//         },
+//         {upsert: true})
+//     if(update.upsertedCount){
+//         res.send(update.upsertedCount+" section added")
+//     } else {
+//         res.send("No section added, requested section already exists")
+//     }
+// })
 
 module.exports = router

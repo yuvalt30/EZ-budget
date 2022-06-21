@@ -37,9 +37,9 @@ router.get('/sections', authenticateToken, async (req, res)=>{
 })
 
 
-router.get('/', authenticateToken, async (req, res) => {
-    res.json( await Users.findById(req.user.id)) 
-})
+// router.get('/', authenticateToken, async (req, res) => {
+//     res.json( await Users.findById(req.user.id)) 
+// })
 
 router.post('/login', async (req, res) => {
     // Auth
@@ -97,26 +97,26 @@ router.delete('/', async (req, res) => {
     } else res.status(400).send("email doesn't exist")
 })
 
-router.delete('/logout', (req, res) => {
-    req.logOut()
-    res.redirect('/login')
-})
+// router.delete('/logout', (req, res) => {
+//     req.logOut()
+//     res.redirect('/login')
+// })
 
-function checkAuthenticated(req,res,next){
-    if(req.isAuthenticated()) {
-        return next()
-    }
+// function checkAuthenticated(req,res,next){
+//     if(req.isAuthenticated()) {
+//         return next()
+//     }
 
-    res.redirect('/login')
-}
+//     res.redirect('/login')
+// }
 
-function checkNotAuthenticated(req,res,next){
-    if(req.isAuthenticated()) {
-        return res.redirect('/')
-    }
+// function checkNotAuthenticated(req,res,next){
+//     if(req.isAuthenticated()) {
+//         return res.redirect('/')
+//     }
 
-    next()
-}
+//     next()
+// }
 
 function authenticateToken(req, res, next){
     const authHeader = req.headers['authorization']

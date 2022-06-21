@@ -19,29 +19,29 @@ const TransactionSchema = new mongoose.Schema({
     }
 });
 
-TransactionSchema.static('getTransactionsBySecAndSubAsync', async function(secName, subName, year) { // TODO: redundunt?
-    if(year){
-        trans = await this.find({ }).populate({
-            path: 'section',
-            match: {subSection: subName, sectionName: secName, date : {
-                $gte: new Date(year, 0),
-                $lt: new Date(year, 11, 31, 23, 59)
-            }},
-        })
-    }else{
-        trans = await this.find({ }).populate({
-            path: 'section',
-            match: {subSection: subName, sectionName: secName},
-        })
-    }
-    let ret = []
-    trans.forEach(tran => {
-        if(tran.section){
-            ret.push(tran)
-        }
-    });
-    return ret
-     });
+// TransactionSchema.static('getTransactionsBySecAndSubAsync', async function(secName, subName, year) { // TODO: redundunt?
+//     if(year){
+//         trans = await this.find({ }).populate({
+//             path: 'section',
+//             match: {subSection: subName, sectionName: secName, date : {
+//                 $gte: new Date(year, 0),
+//                 $lt: new Date(year, 11, 31, 23, 59)
+//             }},
+//         })
+//     }else{
+//         trans = await this.find({ }).populate({
+//             path: 'section',
+//             match: {subSection: subName, sectionName: secName},
+//         })
+//     }
+//     let ret = []
+//     trans.forEach(tran => {
+//         if(tran.section){
+//             ret.push(tran)
+//         }
+//     });
+//     return ret
+//      });
 
 TransactionSchema.static('getTransactionsBySubIdAsync', async function(subId, startDate, endDate) { 
     if(startDate && endDate){
