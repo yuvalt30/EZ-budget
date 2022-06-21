@@ -8,7 +8,6 @@ function divideTransByInOut(trans){
 
 function generateExecFromTransArray(trans, startMonth){
     exec = [0,0,0,0,0,0,0,0,0,0,0,0,]
-    console.log(startMonth)
     trans.forEach(tran => {
         let idx = tran.date.getMonth() - startMonth >= 0 ? tran.date.getMonth() - startMonth : tran.date.getMonth() - startMonth + 12
         exec[idx] += tran.amount
