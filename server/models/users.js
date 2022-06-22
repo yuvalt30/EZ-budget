@@ -20,6 +20,10 @@ const usersSchema = new mongoose.Schema({
     },
     permissions: {
         type:[String],
+    },
+    startMonth: {
+        type: Number,
+        default: 0
     }
 })
 

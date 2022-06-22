@@ -36,6 +36,17 @@ router.get('/sections', authenticateToken, async (req, res)=>{
 
 })
 
+router.put('/:month', authenticateToken, async (req, res) => {
+    try{
+        await Users.findOneAndUpdate(
+            {email: req.user.email.toLowerCase()},
+            {startMonth: req.params.month - 1}
+            )
+        res.status(200).send()
+    } catch {
+        res.status(500).send()
+    }
+})
 
 // router.get('/', authenticateToken, async (req, res) => {
 //     res.json( await Users.findById(req.user.id)) 
@@ -48,9 +59,10 @@ router.post('/login', async (req, res) => {
     if(user == null) {res.status(404).send('Email or password is incorrect.');return}
     try {
         if (await bcrypt.compare(req.body.password, user.password)) {
-            const anUser = { role: user.role, permissions: user.permissions}
+            const anUser = { role: user.role, permissions: user.permissions, email: user.email}
             const accesToken = jwt.sign(anUser, process.env.ACCESS_TOKEN_SECRET)
-            res.json({accessToken: accesToken, name: user.name, role: user.role})
+            console.log(user)
+            res.json({accessToken: accesToken, name: user.name, role: user.role, startMonth: user.startMonth ? user.startMonth : 0 })
         } else {
             res.status(404).send('email or Password is incorrect.')
         }
@@ -59,7 +71,7 @@ router.post('/login', async (req, res) => {
     }
 })
 
-router.post('/register',/*checkNotAuthenticated,*/ async (req, res)=> {
+router.post('/register', async (req, res)=> {
     try{
         if(await getUserByEmail(req.body.email)) {res.status(400).send("email already exist"); return}
         const hashedPassword = await bcrypt.hash(req.body.password, 10)
@@ -83,11 +95,6 @@ router.post('/register',/*checkNotAuthenticated,*/ async (req, res)=> {
     } catch(e) {
         res.status(400).send(e)
     }
-    
-    const user = new Users({
-        username: req.body.username, password: req.body.password})
-        await user.save()
-        res.status(201).send()
 })
 
 router.delete('/', async (req, res) => {
