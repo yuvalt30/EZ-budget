@@ -6,9 +6,9 @@ const router = express.Router()
 const helper = require('./helper')
 const Tran = require('../models/Transaction')
 
-// router.get('/test/:name', async (req, res)=>{
-//     res.send(await helper.transDateRange(req.params.name))
-// })
+router.get('/test/', async (req, res)=>{
+    helper.handleCSV(req.body.text)
+})
 
 router.get('/past', async (req, res) => {
     sectionName = req.query.sectionName

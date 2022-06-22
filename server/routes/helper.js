@@ -43,6 +43,38 @@ async function getSecTransBySubsAsync(secName, begin, end){
      ])
 }
 
+function handleCSV(str) {
+    result = {
+        incomes: [],
+        outcomes: []
+    }
+    stripped = str.split("\'").join('') // strip
+    stripped = stripped.split('&')  // divide income & outcome
+    // incomes
+    stripped[0].split('\r\n').forEach(line => {
+        words = line.split(',')
+        if(words[0])
+            result.incomes.push(
+                {
+                    sectionName: words[0],
+                    subSections: words.slice(1,words.length)
+                }
+            ) 
+    });
+    //outcomes
+    stripped[1].split('\r\n').forEach(line => {
+        words = line.split(',')
+        if(words[0])
+            result.outcomes.push(
+                {
+                    sectionName: words[0],
+                    subSections: words.slice(1,words.length)
+                }
+            )
+    });
+    console.log(result)
+}
+
 function monthDiff(startDate, endDate) {
     return (
       endDate.getMonth() -
@@ -52,5 +84,5 @@ function monthDiff(startDate, endDate) {
   }
 
 module.exports = {generateExecFromTransArray,
-                divideTransByInOut,getSecTransBySubsAsync,monthDiff,
+                divideTransByInOut,getSecTransBySubsAsync,monthDiff,handleCSV,
                 }

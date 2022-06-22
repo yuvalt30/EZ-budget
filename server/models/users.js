@@ -23,7 +23,9 @@ const usersSchema = new mongoose.Schema({
     },
     startMonth: {
         type: Number,
-        default: 0
+        default: 0,
+        min: [0,"month is between 0 and 11"],
+        max: [11,"month is between 0 and 11"]
     }
 })
 

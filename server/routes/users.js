@@ -40,11 +40,12 @@ router.put('/:month', authenticateToken, async (req, res) => {
     try{
         await Users.findOneAndUpdate(
             {email: req.user.email.toLowerCase()},
-            {startMonth: req.params.month - 1}
+            {startMonth: req.params.month},
+            { runValidators: true }
             )
         res.status(200).send()
-    } catch {
-        res.status(500).send()
+    } catch(e) {
+        res.status(500).send(e)
     }
 })
 

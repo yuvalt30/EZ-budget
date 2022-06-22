@@ -39,8 +39,8 @@ router.delete('/', async (req, res) => {
 })
 
 async function createNewSection(section, subs, isIncome) {
-    inserted=0
-    dups=0
+    let inserted=0
+    let dups=0
     await Promise.all(subs.map(async sub => {
         update = await BudgetSections.updateOne({
             sectionName: section, subSection: sub
@@ -79,7 +79,8 @@ router.post('/', async (req, res)=>{
             created+=result[0]
             dup+=result[1]
         }))
-    res.status(201).send(/*created+" section were created, "+dups+" already existed"*/)
+
+    res.status(201).send(created+" section were created, "+dup+" already existed")
 
 })
 
