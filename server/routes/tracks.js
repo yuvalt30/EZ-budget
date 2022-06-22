@@ -28,17 +28,25 @@ router.get('/past', async (req, res) => {
     }
     if(sectionName){
         trans = await Tran.getTransactionsBySecNameAsync(sectionName) // sorted
-        // trans[0] - newest, trans[trans.length-1] - oldest
+        // trans[0] is newest, trans[trans.length-1] is oldest
         begin = req.query.begin ? new Date(req.query.begin) : trans[trans.length-1].date
         end = req.query.end ? new Date(req.query.end) : trans[0].date
         range = helper.monthDiff(begin,end)+1
         if(range < 1) {
             res.status(400).send(" Begin date must be earlier than End date")
         }
-        past = new Array(range).fill(0)
-        trans.forEach(tran => {
+        past = {
+            income: new Array(range).fill(0),
+            outcome: new Array(range).fill(0),
+        }
+        let divided = helper.divideTransByInOut(trans) // [inArray, outArray]
+        divided[0].forEach(tran => {
             if(tran.date >= begin && tran.date <= end)
-                past[helper.monthDiff(begin, tran.date)] += tran.amount
+                past.income[helper.monthDiff(begin, tran.date)] += tran.amount
+        });
+        divided[1].forEach(tran => {
+            if(tran.date >= begin && tran.date <= end)
+                past.outcome[helper.monthDiff(begin, tran.date)] += tran.amount
         });
         res.send(past)
         return

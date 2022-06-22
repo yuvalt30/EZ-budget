@@ -62,7 +62,7 @@ router.post('/login', async (req, res) => {
             const anUser = { role: user.role, permissions: user.permissions, email: user.email}
             const accesToken = jwt.sign(anUser, process.env.ACCESS_TOKEN_SECRET)
             console.log(user)
-            res.json({accessToken: accesToken, name: user.name, role: user.role, startMonth: user.startMonth ? user.startMonth : 0 })
+            res.json({accessToken: accesToken, name: user.name, role: user.role, startMonth: user.startMonth + 1 ? user.startMonth : 1 })
         } else {
             res.status(404).send('email or Password is incorrect.')
         }
