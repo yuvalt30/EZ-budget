@@ -46,7 +46,7 @@ async function createNewSection(section, subs, isIncome) {
     }
     await Promise.all(subs.map(async sub => {
         update = await BudgetSections.updateOne({
-            sectionName: section, subSection: sub
+            sectionName: section, subSection: sub, isIncome: isIncome
             },  
             {
                 sectionName: section, subSection: sub, isIncome: isIncome
