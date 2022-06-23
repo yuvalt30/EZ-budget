@@ -11,47 +11,52 @@ router.get('/test/', async (req, res)=>{
 })
 
 router.get('/past', async (req, res) => {
-    sectionName = req.query.sectionName
-    subId = req.query.subId
-    if(subId){
-        trans = await Tran.getTransactionsBySubIdAsync(subId)
-        begin = req.query.begin ? new Date(req.query.begin) : trans[trans.length-1].date
-        end = req.query.end ? new Date(req.query.end) : trans[0].date
+    try{
 
-        past = new Array(helper.monthDiff(begin,end)+1).fill(0)
-        trans.forEach(tran => {
-            if(tran.date >= begin && tran.date <= end)
-                past[helper.monthDiff(begin, tran.date)] += tran.amount
-        });
-        res.send(past)
-        return
-    }
-    if(sectionName){
-        trans = await Tran.getTransactionsBySecNameAsync(sectionName) // sorted
-        // trans[0] is newest, trans[trans.length-1] is oldest
-        begin = req.query.begin ? new Date(req.query.begin) : trans[trans.length-1].date
-        end = req.query.end ? new Date(req.query.end) : trans[0].date
-        range = helper.monthDiff(begin,end)+1
-        if(range < 1) {
-            res.status(400).send(" Begin date must be earlier than End date")
+        sectionName = req.query.sectionName
+        subId = req.query.subId
+        if(subId){
+            trans = await Tran.getTransactionsBySubIdAsync(subId)
+            begin = req.query.begin ? new Date(req.query.begin) : trans[trans.length-1].date
+            end = req.query.end ? new Date(req.query.end) : trans[0].date
+
+            past = new Array(helper.monthDiff(begin,end)+1).fill(0)
+            trans.forEach(tran => {
+                if(tran.date >= begin && tran.date <= end)
+                    past[helper.monthDiff(begin, tran.date)] += tran.amount
+            });
+            res.send(past)
+            return
         }
-        past = {
-            income: new Array(range).fill(0),
-            outcome: new Array(range).fill(0),
+        if(sectionName){
+            trans = await Tran.getTransactionsBySecNameAsync(sectionName) // sorted
+            // trans[0] is newest, trans[trans.length-1] is oldest
+            begin = req.query.begin ? new Date(req.query.begin) : trans[trans.length-1].date
+            end = req.query.end ? new Date(req.query.end) : trans[0].date
+            range = helper.monthDiff(begin,end)+1
+            if(range < 1) {
+                res.status(400).send(" Begin date must be earlier than End date")
+            }
+            past = {
+                income: new Array(range).fill(0),
+                outcome: new Array(range).fill(0),
+            }
+            let divided = helper.divideTransByInOut(trans) // [inArray, outArray]
+            divided[0].forEach(tran => {
+                if(tran.date >= begin && tran.date <= end)
+                    past.income[helper.monthDiff(begin, tran.date)] += tran.amount
+            });
+            divided[1].forEach(tran => {
+                if(tran.date >= begin && tran.date <= end)
+                    past.outcome[helper.monthDiff(begin, tran.date)] += tran.amount
+            });
+            res.send(past)
+            return
         }
-        let divided = helper.divideTransByInOut(trans) // [inArray, outArray]
-        divided[0].forEach(tran => {
-            if(tran.date >= begin && tran.date <= end)
-                past.income[helper.monthDiff(begin, tran.date)] += tran.amount
-        });
-        divided[1].forEach(tran => {
-            if(tran.date >= begin && tran.date <= end)
-                past.outcome[helper.monthDiff(begin, tran.date)] += tran.amount
-        });
-        res.send(past)
-        return
-    }
-    res.status(400).send()   
+        res.status(400).send()
+        
+    }catch(e) { res.status(500).send(e) }
+
 })
 
 function calcDates(queryStartMonth){
@@ -64,33 +69,38 @@ function calcDates(queryStartMonth){
 
 // get general current year reflection of all sections, each section as sum of its sub sections
 router.get('/', async (req, res)=>{
-    result = { income: [], outcome: []}
-    dates = calcDates(req.query.startMonth)  //  [begin, end]
-    secs = await BudgetSections.getSections()
-    await Promise.all(secs.map(async (sec) => {
-        let trans = await Tran.getTransactionsBySecNameAsync(sec, dates[0], dates[1])  //  (secName, startDate, endDate)
-        let divided = helper.divideTransByInOut(trans) // [inArray, outArray]
-        let plan = await BudgetSections.getSectionBudget(sec)
-        
-        if(p = plan.find(x => x._id === true)){
-            let exec = {
-                section: sec,
+    try{
+        result = { income: [], outcome: []}
+        dates = calcDates(req.query.startMonth)  //  [begin, end]
+        secs = await BudgetSections.getSections()
+        await Promise.all(secs.map(async (sec) => {
+            let trans = await Tran.getTransactionsBySecNameAsync(sec, dates[0], dates[1])  //  (secName, startDate, endDate)
+            let divided = helper.divideTransByInOut(trans) // [inArray, outArray]
+            let plan = await BudgetSections.getSectionBudget(sec)
+            
+            if(p = plan.find(x => x._id === true)){
+                let exec = {
+                    section: sec,
+                }
+                exec.incomeBudget = p.budget
+                exec.income = helper.generateExecFromTransArray(divided[0], startMonth)
+                result.income.push(exec)
             }
-            exec.incomeBudget = p.budget
-            exec.income = helper.generateExecFromTransArray(divided[0], startMonth)
-            result.income.push(exec)
-        }
-        if(p = plan.find(x => x._id === false)){
-            let exec = {
-                section: sec,
+            if(p = plan.find(x => x._id === false)){
+                let exec = {
+                    section: sec,
+                }
+                exec.outcomeBudget = p.budget
+                exec.outcome = helper.generateExecFromTransArray(divided[1], startMonth)
+                result.outcome.push(exec)
             }
-            exec.outcomeBudget = p.budget
-            exec.outcome = helper.generateExecFromTransArray(divided[1], startMonth)
-            result.outcome.push(exec)
-        }
-        // result.push(exec)
-    }))
-    res.send(result)
+            // result.push(exec)
+        }))
+        res.send(result)
+    } catch(e) {
+        res.status(500).send(e)
+    }
+    
 })
 
 // get  year reflection for given section, showing each of its subs

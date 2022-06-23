@@ -41,6 +41,9 @@ router.delete('/', async (req, res) => {
 async function createNewSection(section, subs, isIncome) {
     let inserted=0
     let dups=0
+    if(subs == null || subs.length == 0){
+        return null
+    }
     await Promise.all(subs.map(async sub => {
         update = await BudgetSections.updateOne({
             sectionName: section, subSection: sub
@@ -60,28 +63,31 @@ router.put('/:subId-:amount', async (req, res) => {
         ans = await BudgetSections.findByIdAndUpdate(req.params.subId,{"budget": req.params.amount}, {new: true})
         console.log(ans)
         res.status(200).send()
-    } catch {res.status(500).send()}
+    } catch(e) {res.status(500).send(e)}
 })
 
 // create new section, manually or from CSV file
 router.post('/', async (req, res)=>{
-    created=0
-    dup=0
-    if(req.body.incomes)
-        await Promise.all(req.body.incomes.map(async incomeSection => {
-            result = await createNewSection(incomeSection.sectionName, incomeSection.subSections, true)
-            created+=result[0]
-            dup+=result[1]
-        }))
-    if(req.body.outcomes)
-        await Promise.all(req.body.outcomes.map(async outcomeSection => {
-            result = await createNewSection(outcomeSection.sectionName, outcomeSection.subSections, false)
-            created+=result[0]
-            dup+=result[1]
-        }))
-
-    res.status(201).send(created+" section were created, "+dup+" already existed")
-
+    try{
+        created=0
+        dup=0
+        if(req.body.incomes)
+            await Promise.all(req.body.incomes.map(async incomeSection => {
+                result = await createNewSection(incomeSection.sectionName, incomeSection.subSections, true)
+                created+=result[0]
+                dup+=result[1]
+            }))
+        if(req.body.outcomes)
+            await Promise.all(req.body.outcomes.map(async outcomeSection => {
+                result = await createNewSection(outcomeSection.sectionName, outcomeSection.subSections, false)
+                created+=result[0]
+                dup+=result[1]
+            }))
+    
+        res.status(201).send(created+" section were created, "+dup+" already existed")
+    } catch(e) {
+        res.status(500).send(e)
+    }
 })
 
 module.exports = router
