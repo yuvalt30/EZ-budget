@@ -21,7 +21,6 @@ async function getUserByEmail(anEmail) {
 
 // get all sections, no subs
 router.get('/sections', authenticateToken, async (req, res)=>{
-    console.log("user.sections")
     secs = []
     if(req.user.role == 'ceo' || req.user.role == 'admin') {
         res.send(await BudgetSections.getSubsNamesFromArray([]))

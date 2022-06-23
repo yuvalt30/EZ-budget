@@ -1,13 +1,13 @@
 const express = require('express')
 const BudgetSections = require('../models/BudgetSections')
-// const sectionTrack = require('../models/SectionTrack')
-// const subTrack = require('../models/SubTrack')
 const router = express.Router()
 const helper = require('./helper')
 const Tran = require('../models/Transaction')
 
 router.get('/test/', async (req, res)=>{
-    helper.handleCSV(req.body.text)
+    console.log(await BudgetSections.getSubs())
+    res.send(await BudgetSections.getSubs('ישיבה'))
+
 })
 
 router.get('/past', async (req, res) => {
@@ -77,7 +77,7 @@ router.get('/', async (req, res)=>{
             let trans = await Tran.getTransactionsBySecNameAsync(sec, dates[0], dates[1])  //  (secName, startDate, endDate)
             let divided = helper.divideTransByInOut(trans) // [inArray, outArray]
             let plan = await BudgetSections.getSectionBudget(sec)
-            
+
             if(p = plan.find(x => x._id === true)){
                 let exec = {
                     section: sec,
@@ -109,14 +109,26 @@ router.get('/sec', async (req, res)=>{
         result = { income: [], outcome: []}
         dates = calcDates(req.query.startMonth)  //  [begin, end]
         transBySubs = await helper.getSecTransBySubsAsync(req.query.secName,  dates[0], dates[1])
-        transBySubs.forEach(sub => {
-            let exec = {
-                subSection: sub.subSection,
-                plan: sub.budget,
-                data: helper.generateExecFromTransArray(sub.trans, startMonth)
-            }
-            sub.isIncome ? result.income.push(exec) : result.outcome.push(exec)
-        })
+        allSubs = await BudgetSections.getSubs(req.query.secName)
+        allSubs.forEach(sub => {
+            found = transBySubs.find(t => t.isIncome === sub.isIncome && t.subSection === sub.subSection)
+
+            if(sub.isIncome){
+                let exec = {
+                    section: sub.subSection,
+                    incomeBudget: sub.budget,
+                    income: found ? helper.generateExecFromTransArray(found.trans, startMonth) : Array(12).fill(0)
+                }
+                result.income.push(exec)
+            } else {
+                let exec = {
+                    section: sub.subSection,
+                    outcomeBudget: sub.budget,
+                    outcome: found ? helper.generateExecFromTransArray(found.trans, startMonth) : Array(12).fill(0)
+                }
+                result.outcome.push(exec)
+            } 
+        });
         res.send(result)
     } catch(e) { res.status(500).send(e) }
 })

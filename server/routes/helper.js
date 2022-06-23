@@ -7,7 +7,7 @@ function divideTransByInOut(trans){
 }
 
 function generateExecFromTransArray(trans, startMonth){
-    exec = [0,0,0,0,0,0,0,0,0,0,0,0,]
+    exec = Array(12).fill(0)
     trans.forEach(tran => {
         let idx = tran.date.getMonth() - startMonth >= 0 ? tran.date.getMonth() - startMonth : tran.date.getMonth() - startMonth + 12
         exec[idx] += tran.amount
@@ -41,6 +41,25 @@ async function getSecTransBySubsAsync(secName, begin, end){
          },
          { $project: { subIdDocs: 0, sectionName: 0, _id: 0, __v: 0 } }
      ])
+}
+
+function handleTranCSV(str) {
+    result = []
+    stripped = str.split("\'").join('') // strip
+    stripped.split('\r\n').forEach(line => {
+        words = line.split(',')
+        if(words[0])
+            result.push(
+                {
+                    description: words[0].trim(),
+                    amount: words[1].trim(),
+                    date: words[2].trim(),
+                    subSection: words[4].trim(),
+                    sectionName: words[3].trim(),
+                }
+            ) 
+    });
+    console.log(result)
 }
 
 function handleCSV(str) {
@@ -84,5 +103,5 @@ function monthDiff(startDate, endDate) {
   }
 
 module.exports = {generateExecFromTransArray,
-                divideTransByInOut,getSecTransBySubsAsync,monthDiff,handleCSV,
+                divideTransByInOut,getSecTransBySubsAsync,monthDiff,handleCSV,handleTranCSV,
                 }
