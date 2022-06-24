@@ -112,20 +112,18 @@ router.get('/sec', async (req, res)=>{
         allSubs = await BudgetSections.getSubs(req.query.secName)
         allSubs.forEach(sub => {
             found = transBySubs.find(t => t.isIncome === sub.isIncome && t.subSection === sub.subSection)
-
+            let exec = {
+                section: sub.subSection,
+                _id: sub._id
+            }
             if(sub.isIncome){
-                let exec = {
-                    section: sub.subSection,
-                    incomeBudget: sub.budget,
-                    income: found ? helper.generateExecFromTransArray(found.trans, startMonth) : Array(12).fill(0)
-                }
+                exec.incomeBudget = sub.budget,
+                exec.income = found ? helper.generateExecFromTransArray(found.trans, startMonth) : Array(12).fill(0)
                 result.income.push(exec)
             } else {
-                let exec = {
-                    section: sub.subSection,
-                    outcomeBudget: sub.budget,
-                    outcome: found ? helper.generateExecFromTransArray(found.trans, startMonth) : Array(12).fill(0)
-                }
+                
+                exec.outcomeBudget = sub.budget,
+                exec.outcome = found ? helper.generateExecFromTransArray(found.trans, startMonth) : Array(12).fill(0)
                 result.outcome.push(exec)
             } 
         });
