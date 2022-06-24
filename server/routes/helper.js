@@ -39,7 +39,7 @@ async function getSecTransBySubsAsync(secName, begin, end){
          {
              $replaceRoot: { newRoot: { $mergeObjects: [ { $arrayElemAt: [ "$subIdDocs", 0 ] }, "$$ROOT" ] } }
          },
-         { $project: { subIdDocs: 0, sectionName: 0, _id: 0, __v: 0 } }
+         { $project: { subIdDocs: 0, sectionName: 0, __v: 0 } }
      ])
 }
 
