@@ -117,6 +117,8 @@ router.get('/', async (req, res)=>{
 // get  year reflection for given section, showing each of its subs
 router.get('/sec', async (req, res)=>{
     try{
+        let totalMonthlyIncomeBudget = 0
+        let totalMonthlyOutcomeBudget = 0
         result = { income: [], outcome: []}
         dates = calcDates(req.query.startMonth)  //  [begin, end]
         transBySubs = await helper.getSecTransBySubsAsync(req.query.secName,  dates[0], dates[1])
@@ -128,15 +130,25 @@ router.get('/sec', async (req, res)=>{
                 _id: sub._id
             }
             if(sub.isIncome){
-                exec.incomeBudget = sub.budget,
+                exec.incomeBudget = sub.budget
+                exec.yearlyIncomeBudget = sub.budget * 12
+                totalMonthlyIncomeBudget += sub.budget
                 exec.income = found ? helper.generateExecFromTransArray(found.trans, startMonth) : Array(12).fill(0)
                 result.income.push(exec)
             } else {
-                
-                exec.outcomeBudget = sub.budget,
+                exec.outcomeBudget = sub.budget
+                exec.outcomeBudget = sub.budget
+                exec.yearlyOutcomeBudget = sub.budget * 12
+                totalMonthlyOutcomeBudget += sub.budget
                 exec.outcome = found ? helper.generateExecFromTransArray(found.trans, startMonth) : Array(12).fill(0)
                 result.outcome.push(exec)
             } 
+        });
+        result.income.forEach(exec => {
+            exec["percentage"] = totalMonthlyIncomeBudget ? Math.round(100 * exec.incomeBudget / totalMonthlyIncomeBudget) : 0
+        });
+        result.outcome.forEach(exec => {
+            exec["percentage"] = totalMonthlyOutcomeBudget ? Math.round(100 * exec.outcomeBudget / totalMonthlyOutcomeBudget) : 0
         });
         res.send(result)
     } catch(e) { res.status(500).send(e) }
