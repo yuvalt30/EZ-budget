@@ -45,29 +45,24 @@ async function getSecTransBySubsAsync(secName, begin, end){
 
 async function getAllTransBySecsAsync(begin, end){
     return await Tran.aggregate([
-        { $group : { _id: "$section", trans: { $push:
-            {
-                $cond:[
-                  { $and: [ {$gt: ["$date", begin] }, {$lt: ["$date", end] } ] },
-                  { amount: "$amount", date: "$date"},
-                  "$$REMOVE"
-              ]
-            }
-         }}},
-         { $lookup: {
-             from: "budgetsections",
-             localField: "_id",
-             foreignField: "_id",
-             as: "subIdDocs"
-         }},
-         { $match: {
-            'subIdDocs': { $elemMatch: { sectionName : secName}},
-         }
-         },
-         {
-             $replaceRoot: { newRoot: { $mergeObjects: [ { $arrayElemAt: [ "$subIdDocs", 0 ] }, "$$ROOT" ] } }
-         },
-         { $project: { subIdDocs: 0, sectionName: 0, __v: 0 } }
+        [
+            [{$lookup: {
+                from: 'budgetsections',
+                localField: 'section',
+                foreignField: '_id',
+                as: 'subIdDocs'
+               }}, {$unwind: {
+                path: '$subIdDocs'
+               }}, {$group: {
+                _id: '$subIdDocs.sectionName',
+                trans: {
+                 $push: {
+                  amount: '$amount',
+                  date: '$date'
+                 }
+                }
+               }}]
+          ]
      ])
 }
 

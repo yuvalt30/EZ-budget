@@ -5,7 +5,13 @@ const router = express.Router()
 
 // get all Transactions
 router.get('/', async (req, res)=>{
-    const allTransactions = await Transacion.find({}).sort({date: 1})
+    const allTransactions = await Transacion.find({}, { 
+        // "section": "$section.sectionName",
+        // "subSection": "$section.subSection",
+        // "amount": "$amount",
+        // "date": "$date",
+        // "description": "$description"
+     }).populate('section').sort({date: 1})
     res.send(allTransactions)
 })
 

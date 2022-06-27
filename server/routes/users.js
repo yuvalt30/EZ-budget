@@ -3,7 +3,6 @@ const Users = require('../models/users')
 const BudgetSections = require('../models/BudgetSections')
 const router = express.Router()
 const bcrypt = require('bcrypt')
-const passport = require('passport')
 const jwt = require('jsonwebtoken')
 
 
