@@ -70,6 +70,8 @@ function calcDates(queryStartMonth){
 // get general current year reflection of all sections, each section as sum of its sub sections
 router.get('/', async (req, res)=>{
     try{
+        let totalMonthlyIncomeBudget = 0
+        let totalMonthlyOutcomeBudget = 0
         result = { income: [], outcome: []}
         dates = calcDates(req.query.startMonth)  //  [begin, end]
         secs = await BudgetSections.getSections()
@@ -83,6 +85,8 @@ router.get('/', async (req, res)=>{
                     section: sec,
                 }
                 exec.incomeBudget = p.budget
+                exec.yearlyIncomeBudget = p.budget * 12
+                totalMonthlyIncomeBudget += p.budget
                 exec.income = helper.generateExecFromTransArray(divided[0], startMonth)
                 result.income.push(exec)
             }
@@ -91,11 +95,18 @@ router.get('/', async (req, res)=>{
                     section: sec,
                 }
                 exec.outcomeBudget = p.budget
+                exec.yearlyOutcomeBudget = p.budget * 12
+                totalMonthlyOutcomeBudget += p.budget
                 exec.outcome = helper.generateExecFromTransArray(divided[1], startMonth)
                 result.outcome.push(exec)
             }
-            // result.push(exec)
         }))
+        result.income.forEach(exec => {
+            exec["percentage"] = totalMonthlyIncomeBudget ? Math.round(100 * exec.incomeBudget / totalMonthlyIncomeBudget) : 0
+        });
+        result.outcome.forEach(exec => {
+            exec["percentage"] = totalMonthlyOutcomeBudget ? Math.round(100 * exec.outcomeBudget / totalMonthlyOutcomeBudget) : 0
+        });
         res.send(result)
     } catch(e) {
         res.status(500).send(e)
