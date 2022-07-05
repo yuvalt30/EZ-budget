@@ -44,9 +44,9 @@ async function getSecTransBySubsAsync(secName, begin, end){
 }
 
 async function getAllTransBySecsAsync(begin, end){
-    return await Tran.aggregate([
+    return await Tran.aggregate(
         [
-            [{$lookup: {
+             {$lookup: {
                 from: 'budgetsections',
                 localField: 'section',
                 foreignField: '_id',
@@ -58,12 +58,14 @@ async function getAllTransBySecsAsync(begin, end){
                 trans: {
                  $push: {
                   amount: '$amount',
-                  date: '$date'
+                  date: '$date',
+                  isIncome: '$subIdDocs.isIncome'
                  }
                 }
-               }}]
-          ]
-     ])
+               }}
+        ]
+    )
+     
 }
 
 function handleTranCSV(str) {
@@ -125,6 +127,16 @@ function monthDiff(startDate, endDate) {
     );
   }
 
+  function getMonthTitles(begin, end){
+    titles = new Array(monthDiff(begin,end)+1)
+    for(let i=0; i<titles.length; i++){
+        let m = i+begin.getMonth()
+        titles[i] = (m%12)+1+"/"+(begin.getFullYear() + Math.floor(m / 12)) % 100
+    }
+    return titles
+  }
+
 module.exports = {generateExecFromTransArray,
                 divideTransByInOut,getSecTransBySubsAsync,monthDiff,handleCSV,handleTranCSV,
+                getAllTransBySecsAsync,getMonthTitles,
                 }

@@ -46,7 +46,7 @@ const TransactionSchema = new mongoose.Schema({
 TransactionSchema.static('getTransactionsBySubIdAsync', async function(subId, startDate, endDate) { 
     if(startDate && endDate){
         return await this.find({ section: subId, date: {
-            $gte: startDate,
+            $gt: startDate,
             $lt: endDate
         }}).populate('section')
     }else{
@@ -57,11 +57,12 @@ TransactionSchema.static('getTransactionsBySubIdAsync', async function(subId, st
 TransactionSchema.static('getTransactionsBySecNameAsync', async function(secName, startDate, endDate) {
     if(startDate && endDate){
         trans = await this.find({ date: {
-            $gte: startDate,
+            $gt: startDate,
             $lt: endDate 
         }}).populate({
             path:'section',
             match: {sectionName: secName},
+             sort: { 'section.sectionName': -1 },
         })
     } else {
         trans =  await this.find({}).sort({date:-1}).populate({
