@@ -1,5 +1,5 @@
 const Tran = require('../models/Transaction')
-
+const Plan = require('../models/PlanBudget')
 function divideTransByInOut(trans){
     ret = [[],[]] // income, outcome
     trans.forEach(tran => ret[tran.section.isIncome ? 0 : 1].push(tran))
@@ -136,7 +136,79 @@ function monthDiff(startDate, endDate) {
     return titles
   }
 
+  async function getAllSubsBudgetAsync(sectionName, year){
+    result = await Plan.aggregate(
+        [
+            {
+              '$lookup': {
+                'from': 'budgetsections', 
+                'localField': 'section', 
+                'foreignField': '_id', 
+                'as': 'subIdDocs'
+              }
+            }, {
+              '$replaceRoot': {
+                'newRoot': {
+                  '$mergeObjects': [
+                    {
+                      '$arrayElemAt': [
+                        '$subIdDocs', 0
+                      ]
+                    }, '$$ROOT'
+                  ]
+                }
+              }
+            }, {
+              '$match': {
+                'year': 2022, 
+                'sectionName': 'ישיבה'
+              }
+            }, {
+              '$project': {
+                'amount': 1, 
+                'subSection': 1, 
+                '_id': 0
+              }
+            }
+          ]
+    )
+    let ret = {}
+    result.forEach(element => {
+        ret[element.subSection] = element.amount
+    });
+    return ret
+}
+async function getAllSecsBudgetAsync(year){
+    return await Plan.aggregate(
+        [
+            {
+              '$match': {
+                'year': 2022
+              }
+            }, {
+              '$lookup': {
+                'from': 'budgetsections', 
+                'localField': 'section', 
+                'foreignField': '_id', 
+                'as': 'subIdDocs'
+              }
+            }, {
+              '$unwind': {
+                'path': '$subIdDocs'
+              }
+            }, {
+              '$group': {
+                '_id': '$subIdDocs.sectionName', 
+                'budget': {
+                  '$sum': '$amount'
+                }
+              }
+            }
+          ])
+}
+
 module.exports = {generateExecFromTransArray,
                 divideTransByInOut,getSecTransBySubsAsync,monthDiff,handleCSV,handleTranCSV,
                 getAllTransBySecsAsync,getMonthTitles,
+                getAllSubsBudgetAsync,getAllSecsBudgetAsync,
                 }

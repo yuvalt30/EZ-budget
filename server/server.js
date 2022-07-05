@@ -15,6 +15,7 @@ const sectionsRouter = require('./routes/sections')
 const tracksRouter = require('./routes/tracks')
 const transactionsRouter = require('./routes/transaction')
 const usersRouter = require('./routes/users')
+const planRouter = require('./routes/plans')
 
 mongoose.connect(process.env.DB_URL, {
     useNewUrlParser: true,
@@ -29,6 +30,7 @@ app.use('/sections', sectionsRouter)
 app.use('/tracks', tracksRouter)
 app.use('/transactions', transactionsRouter)
 app.use('/users', usersRouter)
+app.use('/plan', planRouter)
 
 const port = process.env.PORT || 5000
 app.listen(port, ()=>{

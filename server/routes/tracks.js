@@ -226,7 +226,7 @@ router.get('/sec', async (req, res)=>{
         let totalMonthlyOutcomeBudget = 0
         result = { income: [], outcome: [], summary: Array(12).fill(0)}
         dates = calcDates(req.query.startMonth)  //  [begin, end]
-
+        year = req.query.year ? req.query.year : 0
         console.time('getSecTransBySubsAsync')
         transBySubs = await helper.getSecTransBySubsAsync(req.query.secName,  dates[0], dates[1])
         console.timeEnd('getSecTransBySubsAsync')
