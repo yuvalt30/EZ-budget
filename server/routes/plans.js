@@ -19,17 +19,12 @@ router.put('/:subId-:amount', async (req, res) => {
         subId = req.params.subId
         year = new Date().getFullYear()
         let sub = await Sections.findById(subId)
-        if(sub == null) {
-            res.status(400).send('No such sub section')
-            return;
-        }
         update = await Plan.updateOne(
             {section: subId, year: year}
             ,
-            {section: subId, year: year, amount: req.params.amount}
-            ,
-            {upsert: true, runValidators: true})
-        res.status(200).send('updates:'+ update.modifiedCount)
+            {amount: req.params.amount}
+            )
+        res.status(200).send(update.matchedCount ? 'updates:'+ update.modifiedCount : 'No such sub section')
     } catch(e) {res.status(500).send(e)}
 })
 

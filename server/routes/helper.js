@@ -136,22 +136,22 @@ function monthDiff(startDate, endDate) {
     return titles
   }
 
-  async function getAllSubsBudgetAsync(sectionName, year){
+  async function getAllSubsBudgetAsync(year, sectionName){
     result = await Plan.aggregate(
         [
             {
-              '$lookup': {
-                'from': 'budgetsections', 
-                'localField': 'section', 
-                'foreignField': '_id', 
-                'as': 'subIdDocs'
+              $lookup: {
+                from: 'budgetsections', 
+                localField: 'section', 
+                foreignField: '_id', 
+                as: 'subIdDocs'
               }
             }, {
-              '$replaceRoot': {
-                'newRoot': {
-                  '$mergeObjects': [
+              $replaceRoot: {
+                newRoot: {
+                  $mergeObjects: [
                     {
-                      '$arrayElemAt': [
+                      $arrayElemAt: [
                         '$subIdDocs', 0
                       ]
                     }, '$$ROOT'
@@ -159,15 +159,15 @@ function monthDiff(startDate, endDate) {
                 }
               }
             }, {
-              '$match': {
-                'year': 2022, 
-                'sectionName': 'ישיבה'
+              $match: {
+                year: parseInt(year), 
+                sectionName: sectionName
               }
             }, {
-              '$project': {
-                'amount': 1, 
-                'subSection': 1, 
-                '_id': 0
+              $project: {
+                amount: 1, 
+                subSection: 1, 
+                _id: 0
               }
             }
           ]
@@ -179,32 +179,43 @@ function monthDiff(startDate, endDate) {
     return ret
 }
 async function getAllSecsBudgetAsync(year){
-    return await Plan.aggregate(
+    console.log(year +' '+typeof(year))
+    result = await Plan.aggregate(
         [
             {
-              '$match': {
-                'year': 2022
+              $match: {
+                year: parseInt(year)
               }
             }, {
-              '$lookup': {
-                'from': 'budgetsections', 
-                'localField': 'section', 
-                'foreignField': '_id', 
-                'as': 'subIdDocs'
+              $lookup: {
+                from: 'budgetsections', 
+                localField: 'section', 
+                foreignField: '_id', 
+                as: 'subIdDocs'
               }
             }, {
-              '$unwind': {
-                'path': '$subIdDocs'
+              $unwind: {
+                path: '$subIdDocs'
               }
             }, {
-              '$group': {
-                '_id': '$subIdDocs.sectionName', 
-                'budget': {
-                  '$sum': '$amount'
+              $group: {
+                _id: '$subIdDocs.sectionName', 
+                budget: {
+                  $sum: '$amount'
                 }
               }
+            },
+            {
+                $sort: {
+                    _id: 1
+                }
             }
           ])
+          let ret = {}
+          result.forEach(element => {
+            ret[element._id] = element.budget
+          });
+          return ret
 }
 
 module.exports = {generateExecFromTransArray,
