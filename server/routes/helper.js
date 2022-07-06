@@ -179,7 +179,6 @@ function monthDiff(startDate, endDate) {
     return ret
 }
 async function getAllSecsBudgetAsync(year){
-    console.log(year +' '+typeof(year))
     result = await Plan.aggregate(
         [
             {

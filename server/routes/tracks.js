@@ -103,7 +103,6 @@ router.get('/', async (req, res)=>{
             // console.time('getTransactionsBySecNameAsync '+sec)
             let trans = await Tran.getTransactionsBySecNameAsync(sec, dates[0], dates[1])  //  (secName, startDate, endDate)
             // console.timeEnd('getTransactionsBySecNameAsync '+sec)
-            console.log(trans)
             let divided = helper.divideTransByInOut(trans) // [inArray, outArray]
             // console.time('getSectionBudget '+sec)
             let plan = await BudgetSections.getSectionBudget(sec)
@@ -129,8 +128,6 @@ router.get('/', async (req, res)=>{
                 exec.yearlyOutcomeBudget = p.budget * 12
                 totalMonthlyOutcomeBudget += p.budget
                 exec.outcome = helper.generateExecFromTransArray(divided[1], startMonth)
-                // if(sec === 'ישיבה')
-                //     console.log(exec.outcome)
                 result.outcome.push(exec)
             }
             result.summary.push(toSummary)
@@ -143,6 +140,9 @@ router.get('/', async (req, res)=>{
         result.outcome.forEach(exec => {
             exec["percentage"] = totalMonthlyOutcomeBudget ? Math.round(100 * exec.outcomeBudget / totalMonthlyOutcomeBudget) : 0
         });
+        result.income.sort(SecNameSorter)
+        result.outcome.sort(SecNameSorter)
+        result.summary.sort(SecNameSorter)
         res.send(result)
     } catch(e) {
         res.status(500).send(e)
@@ -161,14 +161,15 @@ router.get('/test', async (req, res)=>{
         console.time('await Promise.allsecs')
         console.time('getAllTransBySecsAsync')
         transBySecs = await helper.getAllTransBySecsAsync();
+        // console.log(transBySecs)
         console.timeEnd('getAllTransBySecsAsync')
         console.time('getSections')
 
         allSecs = await BudgetSections.getSections()
         console.timeEnd('getSections')
-        
+
         allSecs.forEach(sec => {
-            found = transBySecs.find(t => t.isIncome === sub.isIncome && t.subSection === sub.subSection)
+            found = transBySecs.find(t => t._id === sub.isIncome && t.subSection === sub.subSection)
 
         });
         await Promise.all(secs.map(async (sec) => {
@@ -267,10 +268,19 @@ router.get('/sec', async (req, res)=>{
         result.outcome.forEach(exec => {
             exec["percentage"] = totalMonthlyOutcomeBudget ? Math.round(100 * exec.outcomeBudget / totalMonthlyOutcomeBudget) : 0
         });
-
+        result.income.sort(SecNameSorter)
+        result.outcome.sort(SecNameSorter)
         res.send(result)
     } catch(e) { res.status(500).send(e) }
 })
+
+const SecNameSorter = (a,b)=>{
+    let fa = a.section
+    let fb = b.section
+    if(fa<fb) return -1
+    if(fa>fb) return 1
+    return 0
+}
 
 // // create new section
 // router.post('/', async (req, res)=>{
