@@ -217,6 +217,9 @@ router.get('/test', async (req, res)=>{
         result.outcome.forEach(exec => {
             exec["percentage"] = totalMonthlyOutcomeBudget ? Math.round(100 * exec.outcomeBudget / totalMonthlyOutcomeBudget) : 0
         });
+        result.income.sort(SecNameSorter)
+        result.outcome.sort(SecNameSorter)
+        result.summary.sort(SecNameSorter)
         res.send(result)
     } catch(e) {
         console.log(e)
