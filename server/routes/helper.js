@@ -5,6 +5,11 @@ function divideTransByInOut(trans){
     trans.forEach(tran => ret[tran.section.isIncome ? 0 : 1].push(tran))
     return ret
 }
+function divideTransByInOutNew(trans){
+  ret = [[],[]] // income, outcome
+  trans.forEach(tran => ret[tran.isIncome ? 0 : 1].push(tran))
+  return ret
+}
 
 function generateExecFromTransArray(trans, startMonth){
     exec = Array(12).fill(0)
@@ -220,5 +225,5 @@ async function getAllSecsBudgetAsync(year){
 module.exports = {generateExecFromTransArray,
                 divideTransByInOut,getSecTransBySubsAsync,monthDiff,handleCSV,handleTranCSV,
                 getAllTransBySecsAsync,getMonthTitles,
-                getAllSubsBudgetAsync,getAllSecsBudgetAsync,
+                getAllSubsBudgetAsync,getAllSecsBudgetAsync,divideTransByInOutNew,
                 }
