@@ -3,12 +3,29 @@ const BudgetSections = require('../models/BudgetSections')
 const router = express.Router()
 const helper = require('./helper')
 const Tran = require('../models/Transaction')
+// const PythonShell = require('python-shell')
+
+let {PythonShell} = require('python-shell')
+
 
 // router.get('/test/', async (req, res)=>{
 //     // console.log(await BudgetSections.getSubs())
 //     res.send(await helper.getAllTransBySecsAsync())
 
 // })
+
+router.get('/predict', (req,res)=>{
+    var options = {
+        args:
+        [
+          req.body.data, // {'data':[1,2,3,...]}
+        ]
+      }
+      PythonShell.run('C:\\EZ-budget\\server\\routes\\linear_regression.py', options, function (err, data) {
+        if (err) res.send(err);
+        res.send(data.toString())
+      });
+})
 
 router.get('/titles', (req,res)=>{
     r = helper.getMonthTitles(new Date(2021,2),new Date())
