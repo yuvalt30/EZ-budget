@@ -21,7 +21,7 @@ router.get('/predict', (req,res)=>{
           req.body.data, // {'data':[1,2,3,...]}
         ]
       }
-      PythonShell.run('C:\\EZ-budget\\server\\routes\\linear_regression.py', options, function (err, data) {
+      PythonShell.run(__dirname+'\\linear_regression.py', options, function (err, data) {
         if (err) res.send(err);
         res.send(data.toString())
       });
