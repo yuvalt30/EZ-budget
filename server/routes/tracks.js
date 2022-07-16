@@ -22,8 +22,12 @@ router.get('/predict', (req,res)=>{
         ]
       }
       PythonShell.run(__dirname+'\\linear_regression.py', options, function (err, data) {
-        if (err) res.send(err);
-        res.send(data.toString())
+        if (err) res.send(err)
+        result = {
+            "name": req.query.name,
+            "prediction" : data.toString()
+        }
+        res.send(result)
       });
 })
 

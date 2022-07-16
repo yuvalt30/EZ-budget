@@ -35,19 +35,6 @@ router.get('/sections', authenticateToken, async (req, res)=>{
 
 })
 
-router.put('/:month', authenticateToken, async (req, res) => {
-    try{
-        await Users.findOneAndUpdate(
-            {email: req.user.email.toLowerCase()},
-            {startMonth: req.params.month},
-            { runValidators: true }
-            )
-        res.status(200).send()
-    } catch(e) {
-        res.status(500).send(e)
-    }
-})
-
 // router.get('/', authenticateToken, async (req, res) => {
 //     res.json( await Users.findById(req.user.id)) 
 // })
@@ -94,6 +81,19 @@ router.post('/register', async (req, res)=> {
         res.status(201).send()
     } catch(e) {
         res.status(400).send(e)
+    }
+})
+
+router.get('/:month', authenticateToken, async (req, res) => {
+    try{
+        await Users.findOneAndUpdate(
+            {email: req.user.email.toLowerCase()},
+            {startMonth: req.params.month},
+            { runValidators: true }
+            )
+        res.status(200).send()
+    } catch(e) {
+        res.status(500).send(e)
     }
 })
 

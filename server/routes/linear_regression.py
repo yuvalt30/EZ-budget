@@ -13,5 +13,5 @@ if __name__ == '__main__':
     def myfunc(x):
         return slope * x + intercept
 
-    speed = myfunc(len(data)+1)
-    print(speed)
+    pred = round(myfunc(len(data)+1))
+    print(pred)
