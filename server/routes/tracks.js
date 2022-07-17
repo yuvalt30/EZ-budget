@@ -15,6 +15,12 @@ let {PythonShell} = require('python-shell')
 // })
 
 router.get('/predict', (req,res)=>{
+    res.send(
+        {
+            "name": req.query.name,
+            "prediction": "770"
+        }
+    );return
     var options = {
         args:
         [
