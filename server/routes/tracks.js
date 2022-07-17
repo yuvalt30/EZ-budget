@@ -108,7 +108,7 @@ function calcDates(queryStartMonth){
 }
 
 // get general current year reflection of all sections, each section as sum of its sub sections
-router.get('/', async (req, res)=>{
+router.get('/test', async (req, res)=>{
     try{
         let totalMonthlyIncomeBudget = 0
         let totalMonthlyOutcomeBudget = 0
@@ -172,7 +172,7 @@ router.get('/', async (req, res)=>{
 })
 
 // get general current year reflection of all sections, each section as sum of its sub sections
-router.get('/test', async (req, res)=>{
+router.get('/', async (req, res)=>{
     try{
         let totalMonthlyIncomeBudget = 0
         let totalMonthlyOutcomeBudget = 0
