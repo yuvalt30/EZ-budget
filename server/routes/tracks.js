@@ -106,7 +106,7 @@ router.get('/past', async (req, res) => {
 })
 
 function calcDates(queryStartMonth){
-    startMonth = queryStartMonth ? queryStartMonth - 1 : 0
+    startMonth = queryStartMonth ? queryStartMonth : 0
     yearShift = new Date().getMonth() < startMonth ? -1 : 0
     begin = new Date(new Date().getFullYear() + yearShift,startMonth)
     end = new Date(new Date().getFullYear()+yearShift+1,startMonth)
@@ -120,10 +120,8 @@ router.get('/test', async (req, res)=>{
         let totalMonthlyOutcomeBudget = 0
         result = { income: [], outcome: [], summary: []}
         dates = calcDates(req.query.startMonth)  //  [begin, end]
-        // console.time('getSections')
 
         secs = await BudgetSections.getSections()
-        // console.timeEnd('getSections')
         console.time('await Promise.allsecs')
 
         await Promise.all(secs.map(async (sec) => {
@@ -193,21 +191,16 @@ router.get('/', async (req, res)=>{
             transBySecsDict[element._id] = element.trans
         });
         // res.send(transBySecsDict);return
-
         console.timeEnd('getAllTransBySecsAsync')
-        console.time('getSections')
 
         allSecs = await BudgetSections.getSections()
-        console.timeEnd('getSections')
 
         await Promise.all(allSecs.map(async (sec) => {
             let found = transBySecsDict[sec]
             let divided
             if(found) divided = helper.divideTransByInOutNew(transBySecsDict[sec]) // [inArray, outArray]
-            
-            // console.time('getSectionBudget '+sec)
             let plan = await BudgetSections.getSectionBudget(sec)
-            // console.timeEnd('getSectionBudget '+sec)
+
             let toSummary = { section: sec } 
             if(p = plan.find(x => x._id === true)){
                 let exec = {
@@ -231,6 +224,7 @@ router.get('/', async (req, res)=>{
                 exec.yearlyOutcomeBudget = p.budget * 12
                 totalMonthlyOutcomeBudget += p.budget
                 exec.outcome = found ? helper.generateExecFromTransArray(divided[1], startMonth) : Array(12).fill(0)
+
                 result.outcome.push(exec)
             }
             result.summary.push(toSummary)
@@ -266,9 +260,7 @@ router.get('/sec', async (req, res)=>{
         console.time('getSecTransBySubsAsync')
         transBySubs = await helper.getSecTransBySubsAsync(req.query.secName,  dates[0], dates[1])
         console.timeEnd('getSecTransBySubsAsync')
-        console.time('getSubs')
         allSubs = await BudgetSections.getSubs(req.query.secName)
-        console.timeEnd('getSubs')
 
         allSubs.forEach(sub => {
             found = transBySubs.find(t => t.isIncome === sub.isIncome && t.subSection === sub.subSection)
