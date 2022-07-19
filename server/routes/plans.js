@@ -20,9 +20,9 @@ router.get('/', async (req,res) => {
 async function createNewBudgetAsync(subId, amount, year){
     try{
         // let sub = await Sections.findById(subId)
+        let filter = year ? {section: subId, year: year} : {section: subId}
         update = await Plan.updateOne(
-            {section: subId, year: year}
-            ,
+            filter,
             {amount: amount}
         )
     } catch(e) {return false}
