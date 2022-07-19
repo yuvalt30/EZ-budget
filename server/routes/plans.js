@@ -4,6 +4,10 @@ const Sections = require('../models/BudgetSections')
 const router = express.Router()
 const helper = require('./helper')
 
+router.post('/test', async (req, res)=>{
+    console.log(req.body.text)
+    res.send(helper.handleCSVBudget(req.body.text))
+})
 
 router.get('/sec', async (req,res) => {
     res.send(await helper.getAllSubsBudgetAsync(req.query.year, req.query.sectionName))
@@ -26,7 +30,7 @@ async function createNewBudgetAsync(subId, amount, year){
 }
 
 router.put('/:subId-:amount', async (req, res) => {
-    if(await createNewBudgetAsync(req.params.subId, req.params.amount), new Date().getFullYear())
+    if(await createNewBudgetAsync(req.params.subId, req.params.amount, new Date().getFullYear()))
     {
         res.status(201).send()
     } else {res.status(500).send('No such sub section')}
@@ -39,7 +43,7 @@ router.post('/file', async (req, res) => {
     await Promise.all(req.body.budgets.map(async budget => {
         secId = await Sections.getSubIdByNames(budget.sectionName, budget.subSection, req.body.isIncome)
         if(secId == null) {notExist+=1}
-        else {if (await createNewBudgetAsync(secId, budget.amount/*, budget.year*/)) {inserted+=1}
+        else {if (await createNewBudgetAsync(secId, budget.amount, budget.year)) {inserted+=1}
             else {e +=1}}
     }))
     console.log(inserted+" inserted, "+e+" errors, "+notExist+" non existing sections")

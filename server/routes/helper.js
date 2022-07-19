@@ -124,6 +124,30 @@ function handleCSV(str) {
     console.log(result)
 }
 
+function handleCSVBudget(str) {
+  result = {
+      budgets: [],
+      isIncome: true // get this value from a dropdown
+  }
+  stripped = str.split("\'").join('') // strip
+  // incomes
+  stripped.split('\r\n').forEach(line => {
+      words = line.split(',')
+      if(words[0] && words[2])
+          result.budgets.push(
+              {
+                sectionName: words[0],
+                subSections: words[1],
+                amount: words[2],
+                year: words[3],
+              }
+          ) 
+  });
+  console.log(result)
+  return result
+}
+
+
 function monthDiff(startDate, endDate) {
     return (
       endDate.getMonth() -
@@ -226,4 +250,5 @@ module.exports = {generateExecFromTransArray,
                 divideTransByInOut,getSecTransBySubsAsync,monthDiff,handleCSV,handleTranCSV,
                 getAllTransBySecsAsync,getMonthTitles,
                 getAllSubsBudgetAsync,getAllSecsBudgetAsync,divideTransByInOutNew,
+                handleCSVBudget,
                 }
