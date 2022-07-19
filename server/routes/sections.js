@@ -72,18 +72,18 @@ router.post('/', async (req, res)=>{
     try{
         created=0
         dup=0
-        if(req.body.incomes)
+        if(req.body.sections)
             await Promise.all(req.body.incomes.map(async incomeSection => {
-                result = await createNewSection(incomeSection.sectionName, incomeSection.subSections, true)
+                result = await createNewSection(incomeSection.sectionName, incomeSection.subSections, req.body.isIncome)
                 created+=result[0]
                 dup+=result[1]
             }))
-        if(req.body.outcomes)
-            await Promise.all(req.body.outcomes.map(async outcomeSection => {
-                result = await createNewSection(outcomeSection.sectionName, outcomeSection.subSections, false)
-                created+=result[0]
-                dup+=result[1]
-            }))
+        // if(req.body.outcomes)
+        //     await Promise.all(req.body.outcomes.map(async outcomeSection => {
+        //         result = await createNewSection(outcomeSection.sectionName, outcomeSection.subSections, false)
+        //         created+=result[0]
+        //         dup+=result[1]
+        //     }))
     
         res.status(201).send(created+" section were created, "+dup+" already existed")
         console.log((created+" section were created, "+dup+" already existed"))

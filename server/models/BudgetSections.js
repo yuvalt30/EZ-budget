@@ -48,8 +48,8 @@ BudgetSectionSchema.static('getSubsNamesFromArray', function(secsArray) {
     ])
 });
 
-BudgetSectionSchema.static('getSubIdByNames', async function(section, sub) { 
-    id = await this.find({ sectionName: section, subSection: sub}, '_id' )
+BudgetSectionSchema.static('getSubIdByNames', async function(section, sub, isIncome) { 
+    id = await this.find({ sectionName: section, subSection: sub, isIncome: isIncome}, '_id' )
     if (id.length == 0){
         return null
     }

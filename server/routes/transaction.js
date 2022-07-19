@@ -39,7 +39,7 @@ router.post('/file', async (req, res)=>{
     let notExist=0
     let e=0
     await Promise.all(req.body.transactions.map(async tran => {
-        secId = await Sections.getSubIdByNames(tran.sectionName, tran.subSection)
+        secId = await Sections.getSubIdByNames(tran.sectionName, tran.subSection, req.body.isIncome)
         if(secId == null) {notExist+=1}
         else {if (await createNewTransactionAsync(secId, tran.amount, tran.description, tran.date)) {inserted+=1}
             else {e +=1}}
