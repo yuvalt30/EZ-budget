@@ -5,8 +5,8 @@ const router = express.Router()
 const helper = require('./helper')
 
 router.post('/test', async (req, res)=>{
-    console.log(req.body.text)
-    res.send(helper.handleCSVBudget(req.body.text))
+    console.log(req.body.data)
+    res.send(helper.handleCSVBudget(req.body.data))
 })
 
 router.get('/sec', async (req,res) => {
@@ -23,17 +23,19 @@ async function createNewBudgetAsync(subId, amount, year){
         let filter = year ? {section: subId, year: year} : {section: subId}
         update = await Plan.updateOne(
             filter,
-            {amount: amount}
+            {amount: amount},
+            {upsert: true}
         )
-    } catch(e) {return false}
-    return update.matchedCount ? true : false
+        console.log(update)
+        return update.matchedCount ? true : false
+    } catch(e) {console.log(e);return false}
 }
 
 router.put('/:subId-:amount', async (req, res) => {
     if(await createNewBudgetAsync(req.params.subId, req.params.amount, new Date().getFullYear()))
     {
         res.status(201).send()
-    } else {res.status(500).send('No such sub section')}
+    } else {res.status(400).send('No such sub section')}
 })
 
 router.post('/file', async (req, res) => {
