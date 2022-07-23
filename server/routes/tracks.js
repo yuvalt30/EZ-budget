@@ -14,7 +14,7 @@ let {PythonShell} = require('python-shell')
 
 // })
 
-router.get('/predict', (req,res)=>{
+router.post('/predict', (req,res)=>{
     // res.send(
     //     {
     //         "name": req.query.name,
