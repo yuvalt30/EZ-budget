@@ -15,6 +15,7 @@ let {PythonShell} = require('python-shell')
 // })
 
 router.post('/predict', (req,res)=>{
+    try{
     // res.send(
     //     {
     //         "name": req.query.name,
@@ -34,7 +35,11 @@ router.post('/predict', (req,res)=>{
             "prediction" : data.toString()
         }
         res.send(result)
-      });
+      });}
+      catch(e){
+        console.log(e)
+        res.status(500).send()
+      }
 })
 
 router.get('/titles', (req,res)=>{
