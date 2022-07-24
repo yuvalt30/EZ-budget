@@ -1,0 +1,251 @@
+.reflection {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  flex-direction: column;
+  .section_table {
+    margin: auto;
+  }
+  .line-chart {
+    width: 700px;
+  }
+  h2 {
+    margin-bottom: 10px;
+    text-align: center;
+  }
+  .chart {
+    display: flex;
+    justify-content: space-between;
+    padding: 3rem 1rem;
+    margin: auto;
+    & > div:first-child {
+      margin-right: 4rem;
+      width: 20rem;
+    }
+    & > div:nth-child(2) {
+      text-align: center;
+      h2 {
+        margin-bottom: 1rem;
+      }
+    }
+  }
+  table {
+    border-color: #bbbbbb13;
+    border-radius: 10px;
+    .alert {
+      color: red;
+      background: #fdd3d3;
+    }
+  }
+
+  td,
+  th {
+    padding: 10px;
+    text-align: center;
+  }
+}
+.subsection_info {
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
+}
+
+.subsection_table {
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(58, 58, 58, 0.473);
+  top: 0;
+  left: 0;
+  flex-direction: column;
+  overflow-y: scroll;
+
+  .choose_action {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    row-gap: 25px;
+    padding: 0 4rem;
+    position: relative;
+    h2 {
+      display: flex;
+      align-items: center;
+      column-gap: 20px;
+      color: #000;
+    }
+    & > svg {
+      position: absolute;
+      top: -5px;
+      cursor: pointer;
+      color: #b4b4b4;
+      font-size: 25px;
+    }
+    .close {
+      right: 0;
+    }
+    .back {
+      left: 0;
+    }
+    .menu {
+      display: flex;
+      align-items: stretch;
+      flex-direction: column;
+      row-gap: 20px;
+    }
+  }
+  & > div {
+    padding: 1rem;
+    border-radius: 1rem;
+    overflow: hidden;
+    background: #fff;
+    overflow-y: scroll;
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+}
+
+.section_table,
+.subsection_table {
+  table {
+    width: 100%;
+  }
+
+  tbody {
+    color: #888888;
+    td:first-child {
+      text-decoration: underline;
+      cursor: pointer;
+    }
+  }
+  thead {
+    tr:first-child {
+      font-weight: 600;
+      background: #8aa9e1;
+      td {
+        background: #8aa9e1;
+        &:first-child {
+          background: #87d5f9;
+        }
+      }
+      .plan_blnc {
+        background: rgb(22, 191, 221);
+      }
+      .crnt_blnc {
+        background: rgb(147, 162, 248);
+      }
+      .prcnt_blnc {
+        background: rgb(216, 147, 248);
+      }
+      .plan_budget_data {
+        background-color: #67eccb;
+      }
+      .execution {
+        background: #f49375;
+      }
+      .predict {
+        background: #ff78b7;
+      }
+    }
+    .plan_budget_data {
+      background-color: #9bf8e1;
+    }
+
+    .execution {
+      background: #ffc5b3;
+    }
+
+    .monthly_budget {
+      background: #a8c2f2;
+    }
+
+    td:first-child {
+      background: #92d6f5;
+    }
+  }
+  .plan_blnc {
+    background: #16bfdd48;
+  }
+  .crnt_blnc {
+    background: #93a2f84d;
+  }
+  .prcnt_blnc {
+    background: #d893f82d;
+  }
+  .plan_budget_data {
+    background-color: #4af2c836;
+  }
+  .execution {
+    background: #ff7d5533;
+  }
+  .monthly_budget {
+    background: #5b8ce931;
+  }
+  td:first-child {
+    background: #65c5f136;
+  }
+}
+
+.all-transactions {
+  width: 100%;
+  padding: 1rem;
+  table {
+    td:first-child {
+      text-decoration: none;
+    }
+    width: 100%;
+  }
+  tbody .subsection_data {
+    background-color: #ff67671f !important;
+  }
+  .section_table {
+    width: 100%;
+  }
+  .fixTableHead {
+    max-height: 500px;
+  }
+  .subsection_data {
+    background-color: #ff6767 !important;
+  }
+}
+
+.charts {
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(58, 58, 58, 0.473);
+  top: 0;
+  left: 0;
+  overflow-y: scroll;
+  z-index: 999;
+  flex-direction: column;
+  gap: 20px;
+  & > div {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    div {
+      padding: 20px;
+      border-radius: 10px;
+      background: #fff;
+    }
+  }
+  canvas {
+    width: clamp(300px, 530px, 600px) !important;
+    height: clamp(300px, 530px, 600px) !important;
+  }
+}
+
+.sub-section-title {
+  display: flex;
+  justify-content: flex-start;
+  gap: 20px;
+  align-items: center;
+  margin-bottom: 20px;
+}

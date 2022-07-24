@@ -1,0 +1,27 @@
+.register {
+  .dropdown__option {
+    justify-content: space-between;
+    display: flex;
+  }
+  .sign-up-container {
+    max-width: 500px;
+  }
+  .input {
+    margin: 2px 0;
+  }
+  .dropdown {
+    text-transform: capitalize;
+  }
+  h1 {
+    text-align: center;
+  }
+  span {
+    display: block;
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+  button {
+    width: 100%;
+    margin-top: 10px;
+  }
+}

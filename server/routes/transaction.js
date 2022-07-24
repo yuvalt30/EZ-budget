@@ -17,16 +17,17 @@ router.get('/', async (req, res)=>{
 
 async function createNewTransactionAsync(section, amount, description, date){
     const newTransaction = new Transacion({section: section, amount: amount});
-    if(date) newTransaction.date = date
+    if(date) newTransaction.date = new Date(date)
     if(description) newTransaction.description = description
-    console.log(newTransaction)
     try{
         await newTransaction.save();
-        return true
     } catch(err){
+        console.log(newTransaction)
         console.log(err)
         return false
     }
+    console.log('success date='+date)
+    return true
 }
 
 // create new transaction manually
@@ -43,7 +44,7 @@ router.post('/file', async (req, res)=>{
     // console.log(req.body.transactions)
     await Promise.all(req.body.transactions.map(async tran => {
         secId = await Sections.getSubIdByNames(tran.sectionName, tran.subSection, req.body.isIncome)
-        if(secId == null) {notExist+=1; console.log(tran.sectionName+" " +tran.subSection+ ' '+ req.body.isIncome)}
+        if(secId == null) {notExist+=1; console.log("non exist secName: ,"+tran.sectionName+",\tsub: ," +tran.subSection+',')}
         else {if (await createNewTransactionAsync(secId, tran.amount, tran.description, tran.date)) {inserted+=1}
             else {e +=1}}
     }))

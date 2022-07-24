@@ -1,0 +1,48 @@
+.setting {
+  & > svg {
+    position: fixed;
+    bottom: 1rem;
+    left: 18rem;
+    background: #47bdf3;
+    padding: 1rem;
+    color: #fff;
+    border-radius: 50%;
+    box-sizing: content-box;
+    font-size: 2rem;
+    cursor: pointer;
+    z-index: 9999;
+  }
+  & > div {
+    background: #0000003b;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 99999;
+    min-width: 300px;
+    & > div {
+      background: #fff;
+      padding: 2rem;
+      border-radius: 1rem;
+      position: relative;
+      button {
+        width: 100%;
+      }
+      & > svg {
+        opacity: 0.4;
+        position: absolute;
+        right: 1.5rem;
+        top: 1.5rem;
+        cursor: pointer;
+        z-index: 1000;
+      }
+    }
+    .dropdown {
+      min-width: 300px;
+    }
+  }
+}

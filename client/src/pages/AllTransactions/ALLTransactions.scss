@@ -1,0 +1,17 @@
+.filter {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  column-gap: 30px;
+  p {
+    margin-bottom: 5px !important;
+  }
+}
+.transaction-container {
+  width: 100%;
+  height: 100vh;
+  overflow-y: scroll;
+  padding-top: 2rem;
+  background: #fff;
+}

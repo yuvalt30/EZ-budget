@@ -1,0 +1,23 @@
+:root {
+  --blue: #47bdf3;
+  --white: #fff;
+  --gray: #f5f5f5;
+  --black1: #222;
+  --black2: #999;
+}
+
+.dashboard {
+  width: 100%;
+  flex-direction: column;
+  .dashboard_form {
+    column-gap: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  
+  input {
+    margin: 0;
+  }
+}

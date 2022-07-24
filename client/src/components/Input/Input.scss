@@ -1,0 +1,34 @@
+.input {
+  margin: 10px 0;
+  p {
+    color: rgba(69, 76, 92, 0.5);
+    margin-bottom: 5px;
+    font-weight: 500;
+  }
+  input,
+  textarea {
+    padding: 10px;
+    border: 1px solid #e9ebef;
+    width: 29em;
+    resize: none;
+    border-radius: 6px;
+    outline: none;
+    &:focus {
+      border: 1px solid #47bdf3;
+    }
+    &.error {
+      border: 1px solid #f73a3a;
+    }
+  }
+  textarea {
+    height: 5rem;
+  }
+}
+
+.input_grp {
+  display: flex;
+  column-gap: 30px;
+  input {
+    width: 250px;
+  }
+}
