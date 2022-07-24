@@ -45,7 +45,7 @@ async function createNewSection(section, subs, isIncome) {
         return null
     }
     await Promise.all(subs.map(async sub => {
-        if(sub)
+        if(sub){
             update = await BudgetSections.updateOne({
                 sectionName: section, subSection: sub, isIncome: isIncome
                 },  
@@ -54,7 +54,8 @@ async function createNewSection(section, subs, isIncome) {
                 },
                 {upsert: true, runValidators: true})
             if(update.upsertedCount) {inserted += 1}
-            else {dups += 1}       
+            else {dups += 1}
+        }       
     }));
     return [inserted,dups]
 }
@@ -72,8 +73,9 @@ router.post('/', async (req, res)=>{
     try{
         created=0
         dup=0
+        console.log(req.body)
         if(req.body.sections)
-            await Promise.all(req.body.incomes.map(async incomeSection => {
+            await Promise.all(req.body.sections.map(async incomeSection => {
                 result = await createNewSection(incomeSection.sectionName, incomeSection.subSections, req.body.isIncome)
                 created+=result[0]
                 dup+=result[1]
@@ -88,6 +90,7 @@ router.post('/', async (req, res)=>{
         res.status(201).send(created+" section were created, "+dup+" already existed")
         console.log((created+" section were created, "+dup+" already existed"))
     } catch(e) {
+        console.log(e)
         res.status(500).send(e)
     }
 })

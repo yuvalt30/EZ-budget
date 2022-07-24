@@ -19,10 +19,12 @@ async function createNewTransactionAsync(section, amount, description, date){
     const newTransaction = new Transacion({section: section, amount: amount});
     if(date) newTransaction.date = date
     if(description) newTransaction.description = description
+    console.log(newTransaction)
     try{
         await newTransaction.save();
         return true
     } catch(err){
+        console.log(err)
         return false
     }
 }
@@ -38,9 +40,10 @@ router.post('/file', async (req, res)=>{
     let inserted=0
     let notExist=0
     let e=0
+    // console.log(req.body.transactions)
     await Promise.all(req.body.transactions.map(async tran => {
         secId = await Sections.getSubIdByNames(tran.sectionName, tran.subSection, req.body.isIncome)
-        if(secId == null) {notExist+=1}
+        if(secId == null) {notExist+=1; console.log(tran.sectionName+" " +tran.subSection+ ' '+ req.body.isIncome)}
         else {if (await createNewTransactionAsync(secId, tran.amount, tran.description, tran.date)) {inserted+=1}
             else {e +=1}}
     }))
